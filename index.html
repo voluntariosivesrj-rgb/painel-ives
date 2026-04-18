@@ -722,7 +722,7 @@
         <div class="brand-copy">
           <div class="eyebrow">Dashboard executivo • IVES Church Rio de Janeiro</div>
           <h1>IVES | Base de Voluntários</h1>
-          <p class="subtitle">Painel moderno com sincronização automática da planilha, filtros avançados por mês e período, leitura direta do Google Sheets e visual alinhado à identidade da logo enviada.</p>
+          <p class="subtitle">Painel moderno.</p>
         </div>
       </div>
       <div class="header-actions">
@@ -733,7 +733,7 @@
 
     <section class="toolbar">
       <article class="card metric">
-        <div class="metric-label"><span>Total de voluntários</span><span>Base geral</span></div>
+        <div class="metric-label"><span>Total de voluntários</span><span></span></div>
         <div id="kpiTotal" class="metric-value">--</div>
         <div id="kpiTotalHelper" class="metric-helper">Carregando base...</div>
       </article>
@@ -743,17 +743,17 @@
         <div id="kpiAreasHelper" class="metric-helper">Aguardando dados</div>
       </article>
       <article class="card metric">
-        <div class="metric-label"><span>% batizados</span><span>Status espiritual</span></div>
+        <div class="metric-label"><span>% batizados</span><span></span></div>
         <div id="kpiBatizados" class="metric-value">--</div>
         <div id="kpiBatizadosHelper" class="metric-helper">Aguardando dados</div>
       </article>
       <article class="card metric">
-        <div class="metric-label"><span>Novos voluntários</span><span>Entrada recente</span></div>
+        <div class="metric-label"><span>Novos voluntários</span><span></span></div>
         <div id="kpiNovos" class="metric-value">--</div>
         <div id="kpiNovosHelper" class="metric-helper">Aguardando dados</div>
       </article>
       <article class="card metric">
-        <div class="metric-label"><span>Sincronização</span><span>Automática</span></div>
+        <div class="metric-label"><span>Sincronização</span><span></span></div>
         <div id="kpiSync" class="metric-value">15s</div>
         <div id="kpiSyncHelper" class="metric-helper">Atualiza sozinho e ao voltar para a aba</div>
       </article>
@@ -790,11 +790,11 @@
 
         <div class="filter-grid">
           <div class="field">
-            <label for="filterStartDate">Data inicial de cadastro (Data de Cadastro - H)</label>
+            <label for="filterStartDate">Data inicial de cadastro </label>
             <input id="filterStartDate" type="date" />
           </div>
           <div class="field">
-            <label for="filterEndDate">Data final de cadastro (Data de Cadastro - H)</label>
+            <label for="filterEndDate">Data final de cadastro </label>
             <input id="filterEndDate" type="date" />
           </div>
         </div>
@@ -828,7 +828,7 @@
 
       <main class="main-grid">
         <div class="status-strip">
-          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Sincronização automática ativa</span></div>
+          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Sincronização  ativa</span></div>
           <div class="status-copy">
             <span class="status-strong" id="statusText">Conectando ao Google Sheets...</span>
             <span id="statusSubtext"> O painel usa leitura online da planilha publicada e aplica atualização automática sem precisar editar o HTML.</span>
@@ -844,7 +844,7 @@
             <div class="panel-head">
               <div>
                 <h2>Quantidade por área</h2>
-                <p>Visão rápida dos ministérios com maior volume dentro do filtro aplicado.</p>
+                <p>Visão rápida dos  com maior volume dentro do filtro aplicado.</p>
               </div>
               <div id="areaMeta" class="panel-meta">--</div>
             </div>
@@ -869,7 +869,7 @@
           <div class="panel-head">
             <div>
               <h2>Visão de liderança e apoio</h2>
-              <p>Leitura direta das colunas J, K e L para identificar quem lidera área, quem lidera IC e quem serve em outras frentes.</p>
+              <p>.</p>
             </div>
             <div id="leadMeta" class="panel-meta">--</div>
           </div>
@@ -878,7 +878,7 @@
               <div class="lead-top">
                 <div>
                   <div class="lead-title">Líder de área</div>
-                  <div class="lead-subtitle">Coluna J • área liderada</div>
+                  <div class="lead-subtitle"></div>
                 </div>
                 <div id="leadAreaCount" class="lead-count">0</div>
               </div>
@@ -888,7 +888,7 @@
               <div class="lead-top">
                 <div>
                   <div class="lead-title">Líder de IC</div>
-                  <div class="lead-subtitle">Coluna K • nome do IC</div>
+                  <div class="lead-subtitle"></div>
                 </div>
                 <div id="leadICCount" class="lead-count">0</div>
               </div>
@@ -897,8 +897,8 @@
             <div class="lead-card">
               <div class="lead-top">
                 <div>
-                  <div class="lead-title">Mais áreas / ministérios</div>
-                  <div class="lead-subtitle">Coluna L • frentes adicionais</div>
+                  <div class="lead-title">Mais áreas / </div>
+                  <div class="lead-subtitle"></div>
                 </div>
                 <div id="leadExtraCount" class="lead-count">0</div>
               </div>
@@ -911,7 +911,7 @@
           <div class="panel-head">
             <div>
               <h2>Tabela detalhada</h2>
-              <p>Lista dinâmica atualizada conforme os filtros. A data exibida e filtrada usa a coluna H (Data de Cadastro).</p>
+              <p>Lista dinâmica atualizada conforme os filtros. </p>
             </div>
             <div id="tableMeta" class="panel-meta">--</div>
           </div>
@@ -1477,7 +1477,7 @@
         ? `Exibindo ${formatNumber(state.filteredRows.length)} voluntário(s) com base nos filtros atuais.`
         : 'Nenhum registro encontrado com o recorte selecionado.';
       el.statusSubtext.textContent = state.source === 'Google Sheets online'
-        ? ' Os dados foram lidos online e continuam sendo verificados automaticamente.'
+        ? ' '
         : ' A visualização está usando a cópia de segurança embutida porque a leitura online falhou neste momento.';
     }
 
