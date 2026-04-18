@@ -1,1 +1,1632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>IVES | Base de Voluntários</title>
+  <style>
+    :root {
+      --bg: #f7f3fb;
+      --surface: rgba(255,255,255,0.92);
+      --surface-strong: #ffffff;
+      --text: #20152f;
+      --muted: #756a86;
+      --line: rgba(106, 46, 160, 0.12);
+      --primary: #6a2ea0;
+      --primary-2: #7a3ff2;
+      --primary-3: #efe7fb;
+      --accent: #f6d21a;
+      --accent-2: #f28c28;
+      --pink: #e84aa8;
+      --green: #1f9d63;
+      --red: #c54d61;
+      --shadow: 0 18px 50px rgba(90, 36, 145, 0.14);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --transition: 220ms ease;
+    }
 
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(232,74,168,.10), transparent 22%),
+        radial-gradient(circle at top left, rgba(122,63,242,.11), transparent 25%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 52%, #f3ecfb 100%);
+    }
+
+    body { overflow-x: hidden; }
+
+    .app {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .header {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) auto;
+      gap: 20px;
+      padding: 26px 28px;
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,.26), transparent 18%),
+        linear-gradient(135deg, #5b258b 0%, #6a2ea0 38%, #7a3ff2 72%, #e84aa8 100%);
+      color: #fff;
+      box-shadow: 0 24px 60px rgba(89, 36, 138, .28);
+      isolation: isolate;
+    }
+
+    .header::before,
+    .header::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(12px);
+      z-index: -1;
+    }
+
+    .header::before {
+      width: 240px;
+      height: 240px;
+      background: rgba(246, 210, 26, 0.18);
+      right: -70px;
+      top: -60px;
+    }
+
+    .header::after {
+      width: 220px;
+      height: 220px;
+      background: rgba(232, 74, 168, 0.16);
+      left: -80px;
+      bottom: -120px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      object-fit: cover;
+      border: 3px solid rgba(255,255,255,.24);
+      background: rgba(255,255,255,.12);
+      box-shadow: 0 20px 45px rgba(0,0,0,.18);
+    }
+
+    .brand-copy { min-width: 0; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      max-width: 780px;
+      color: rgba(255,255,255,.9);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-content: flex-start;
+    }
+
+    .pill-link,
+    .ghost-btn,
+    .solid-btn {
+      appearance: none;
+      border: 0;
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 700;
+      transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .pill-link:hover,
+    .ghost-btn:hover,
+    .solid-btn:hover { transform: translateY(-1px); }
+
+    .pill-link {
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .solid-btn {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #2b1b08;
+      box-shadow: 0 14px 34px rgba(242, 140, 40, .3);
+    }
+
+    .ghost-btn {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .metric {
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      min-height: 132px;
+    }
+
+    .metric:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 54px rgba(90, 36, 145, .17);
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      right: -28px;
+      bottom: -46px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,63,242,.16) 0%, rgba(122,63,242,0) 68%);
+    }
+
+    .metric-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-value {
+      font-size: clamp(30px, 4vw, 42px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-helper {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 18px;
+      padding: 22px;
+    }
+
+    .panel-title {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .panel-subtitle {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 15px;
+      border: 1px solid rgba(106,46,160,.14);
+      background: #fff;
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(122,63,242,.6);
+      box-shadow: 0 0 0 4px rgba(122,63,242,.12);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .actions-stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .mini-stat {
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(239,231,251,.85) 0%, rgba(255,255,255,.96) 100%);
+      border: 1px solid rgba(106,46,160,.1);
+      padding: 14px;
+    }
+
+    .mini-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .mini-value {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .status-strip {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(106,46,160,.1);
+      box-shadow: var(--shadow);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      background: rgba(31,157,99,.10);
+      color: var(--green);
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 5px rgba(31,157,99,.10);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(.88); opacity: .6; }
+    }
+
+    .status-copy {
+      flex: 1 1 320px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-strong { color: var(--text); font-weight: 700; }
+
+    .notice,
+    .error-box,
+    .loading-box {
+      display: none;
+      margin-bottom: 18px;
+      border-radius: 20px;
+      padding: 16px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid transparent;
+    }
+
+    .loading-box {
+      background: rgba(122,63,242,.08);
+      border-color: rgba(122,63,242,.12);
+      color: var(--primary);
+    }
+
+    .notice {
+      background: rgba(246,210,26,.15);
+      border-color: rgba(242,140,40,.2);
+      color: #6b4a07;
+    }
+
+    .error-box {
+      background: rgba(197,77,97,.1);
+      border-color: rgba(197,77,97,.18);
+      color: #8b233d;
+    }
+
+    .main-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .panel { padding: 22px; }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .panel-meta {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      min-height: 220px;
+      align-content: start;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 160px) minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bar-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(106,46,160,.08), rgba(106,46,160,.04));
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      width: 0;
+      transition: width .5s ease;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 50%, var(--pink) 100%);
+      box-shadow: 0 10px 22px rgba(106,46,160,.22);
+    }
+
+    .bar-row.type .bar-fill {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      box-shadow: 0 10px 22px rgba(242,140,40,.2);
+    }
+
+    .bar-value {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 18px;
+      border: 1px dashed rgba(106,46,160,.16);
+      border-radius: 18px;
+      text-align: center;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(106,46,160,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,246,253,.98));
+    }
+
+    table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(106,46,160,.96);
+      color: #fff;
+      z-index: 1;
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    tbody td {
+      padding: 15px 16px;
+      border-bottom: 1px solid rgba(106,46,160,.08);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: rgba(106,46,160,.035); }
+
+    .name-cell strong { display: block; margin-bottom: 4px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chip-area { background: rgba(122,63,242,.12); color: var(--primary); }
+    .chip-batizado-sim { background: rgba(31,157,99,.12); color: var(--green); }
+    .chip-batizado-nao { background: rgba(197,77,97,.12); color: var(--red); }
+    .chip-tipo-novo { background: rgba(246,210,26,.18); color: #6b4a07; }
+    .chip-tipo-existente { background: rgba(232,74,168,.12); color: #9b1d66; }
+
+    .table-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .lead-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .lead-card {
+      border-radius: 22px;
+      border: 1px solid rgba(106,46,160,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,238,252,.96));
+      padding: 18px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .lead-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .lead-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .lead-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .lead-count {
+      min-width: 58px;
+      text-align: center;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, rgba(106,46,160,.12), rgba(122,63,242,.16));
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .lead-list {
+      display: grid;
+      gap: 10px;
+      max-height: 340px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .lead-item {
+      border-radius: 16px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(106,46,160,.08);
+      padding: 12px 13px;
+    }
+
+    .lead-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .lead-item span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    @media (max-width: 1180px) {
+      .lead-grid { grid-template-columns: 1fr; }
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1380px) {
+      .toolbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 860px) {
+      .app { padding: 14px; }
+      .header { grid-template-columns: 1fr; padding: 22px; }
+      .brand { align-items: flex-start; }
+      .brand-logo { width: 78px; height: 78px; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .filter-grid, .actions-stack, .mini-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr; gap: 6px; }
+      .bar-value { text-align: left; }
+    }
+
+    @media (max-width: 640px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .status-strip { align-items: flex-start; }
+      .pill-link, .ghost-btn, .solid-btn { width: 100%; text-align: center; justify-content: center; }
+      .header-actions { justify-content: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <img class="brand-logo" src="data:image/jpeg;base64,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" alt="Logo IVES" />
+        <div class="brand-copy">
+          <div class="eyebrow">Dashboard executivo • IVES Church Rio de Janeiro</div>
+          <h1>IVES | Base de Voluntários</h1>
+          <p class="subtitle">Painel moderno com sincronização automática da planilha, filtros avançados por mês e período, leitura direta do Google Sheets e visual alinhado à identidade da logo enviada.</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="pill-link" href="https://docs.google.com/spreadsheets/d/1dellM3V5kBTXGA-Z386RjfOg8278g1r3HjPEcYFDdyU/edit?gid=1076898492#gid=1076898492" target="_blank" rel="noreferrer">Abrir planilha</a>
+        <button id="syncNowBtn" class="solid-btn" type="button">Sincronizar agora</button>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <article class="card metric">
+        <div class="metric-label"><span>Total de voluntários</span><span>Base geral</span></div>
+        <div id="kpiTotal" class="metric-value">--</div>
+        <div id="kpiTotalHelper" class="metric-helper">Carregando base...</div>
+      </article>
+      <article class="card metric">
+        <div class="metric-label"><span>Áreas únicas</span><span>Ministérios</span></div>
+        <div id="kpiAreas" class="metric-value">--</div>
+        <div id="kpiAreasHelper" class="metric-helper">Aguardando dados</div>
+      </article>
+      <article class="card metric">
+        <div class="metric-label"><span>% batizados</span><span>Status espiritual</span></div>
+        <div id="kpiBatizados" class="metric-value">--</div>
+        <div id="kpiBatizadosHelper" class="metric-helper">Aguardando dados</div>
+      </article>
+      <article class="card metric">
+        <div class="metric-label"><span>Novos voluntários</span><span>Entrada recente</span></div>
+        <div id="kpiNovos" class="metric-value">--</div>
+        <div id="kpiNovosHelper" class="metric-helper">Aguardando dados</div>
+      </article>
+      <article class="card metric">
+        <div class="metric-label"><span>Sincronização</span><span>Automática</span></div>
+        <div id="kpiSync" class="metric-value">15s</div>
+        <div id="kpiSyncHelper" class="metric-helper">Atualiza sozinho e ao voltar para a aba</div>
+      </article>
+    </section>
+
+    <div class="layout">
+      <aside class="card sidebar">
+        <h2 class="panel-title">Filtros inteligentes</h2>
+        <p class="panel-subtitle">Busque por nome, área, estado civil, batismo e período usando a data de cadastro. A tabela, cards, visão de liderança e gráficos atualizam juntos.</p>
+
+        <div class="field">
+          <label for="searchName">Buscar por nome</label>
+          <input id="searchName" type="search" placeholder="Digite o nome do voluntário" />
+        </div>
+
+        <div class="field">
+          <label for="filterArea">Área</label>
+          <select id="filterArea"><option value="">Todas as áreas</option></select>
+        </div>
+
+        <div class="field">
+          <label for="filterEstadoCivil">Estado civil</label>
+          <select id="filterEstadoCivil"><option value="">Todos os estados civis</option></select>
+        </div>
+
+        <div class="field">
+          <label for="filterBatizado">Batizado</label>
+          <select id="filterBatizado">
+            <option value="">Todos</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+          </select>
+        </div>
+
+        <div class="filter-grid">
+          <div class="field">
+            <label for="filterStartDate">Data inicial de cadastro (Data de Cadastro - H)</label>
+            <input id="filterStartDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="filterEndDate">Data final de cadastro (Data de Cadastro - H)</label>
+            <input id="filterEndDate" type="date" />
+          </div>
+        </div>
+
+        <div class="actions-stack">
+          <button id="clearFiltersBtn" class="ghost-btn" type="button">Limpar filtros</button>
+          <button id="reloadBtn" class="solid-btn" type="button">Recarregar base</button>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-stat">
+            <div class="mini-label">Registros exibidos</div>
+            <div id="miniMostrando" class="mini-value">--</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-label">Fonte</div>
+            <div id="miniFonte" class="mini-value">Online</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-label">Última atualização</div>
+            <div id="lastUpdated" class="mini-value" style="font-size:16px; line-height:1.35;">--</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-label">Próxima checagem</div>
+            <div id="nextSync" class="mini-value" style="font-size:16px; line-height:1.35;">--</div>
+          </div>
+        </div>
+
+        <p class="footer-note">Os filtros de data usam exclusivamente a data de cadastro. Se a planilha for alterada, o dashboard consulta novamente a base automaticamente em intervalos curtos e também quando a aba volta ao foco.</p>
+      </aside>
+
+      <main class="main-grid">
+        <div class="status-strip">
+          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Sincronização automática ativa</span></div>
+          <div class="status-copy">
+            <span class="status-strong" id="statusText">Conectando ao Google Sheets...</span>
+            <span id="statusSubtext"> O painel usa leitura online da planilha publicada e aplica atualização automática sem precisar editar o HTML.</span>
+          </div>
+        </div>
+
+        <div id="loadingBox" class="loading-box" style="display:block;">Carregando base de voluntários e preparando o dashboard...</div>
+        <div id="noticeBox" class="notice"></div>
+        <div id="errorBox" class="error-box"></div>
+
+        <section class="charts-grid">
+          <article class="card panel">
+            <div class="panel-head">
+              <div>
+                <h2>Quantidade por área</h2>
+                <p>Visão rápida dos ministérios com maior volume dentro do filtro aplicado.</p>
+              </div>
+              <div id="areaMeta" class="panel-meta">--</div>
+            </div>
+            <div id="areaBars" class="bars"></div>
+            <div id="areaEmpty" class="empty-state hidden">Nenhuma área encontrada para o filtro atual.</div>
+          </article>
+
+          <article class="card panel">
+            <div class="panel-head">
+              <div>
+                <h2>Quantidade por tipo</h2>
+                <p>Comparativo entre novos voluntários e pessoas que já servem / mudaram de área.</p>
+              </div>
+              <div id="typeMeta" class="panel-meta">--</div>
+            </div>
+            <div id="typeBars" class="bars"></div>
+            <div id="typeEmpty" class="empty-state hidden">Sem dados suficientes para montar este gráfico.</div>
+          </article>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div>
+              <h2>Visão de liderança e apoio</h2>
+              <p>Leitura direta das colunas J, K e L para identificar quem lidera área, quem lidera IC e quem serve em outras frentes.</p>
+            </div>
+            <div id="leadMeta" class="panel-meta">--</div>
+          </div>
+          <div class="lead-grid">
+            <div class="lead-card">
+              <div class="lead-top">
+                <div>
+                  <div class="lead-title">Líder de área</div>
+                  <div class="lead-subtitle">Coluna J • área liderada</div>
+                </div>
+                <div id="leadAreaCount" class="lead-count">0</div>
+              </div>
+              <div id="leadAreaList" class="lead-list"></div>
+            </div>
+            <div class="lead-card">
+              <div class="lead-top">
+                <div>
+                  <div class="lead-title">Líder de IC</div>
+                  <div class="lead-subtitle">Coluna K • nome do IC</div>
+                </div>
+                <div id="leadICCount" class="lead-count">0</div>
+              </div>
+              <div id="leadICList" class="lead-list"></div>
+            </div>
+            <div class="lead-card">
+              <div class="lead-top">
+                <div>
+                  <div class="lead-title">Mais áreas / ministérios</div>
+                  <div class="lead-subtitle">Coluna L • frentes adicionais</div>
+                </div>
+                <div id="leadExtraCount" class="lead-count">0</div>
+              </div>
+              <div id="leadExtraList" class="lead-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head">
+            <div>
+              <h2>Tabela detalhada</h2>
+              <p>Lista dinâmica atualizada conforme os filtros. A data exibida e filtrada usa a coluna H (Data de Cadastro).</p>
+            </div>
+            <div id="tableMeta" class="panel-meta">--</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome completo</th>
+                  <th>Área</th>
+                  <th>Estado civil</th>
+                  <th>Batizado</th>
+                  <th>Tipo</th>
+                  <th>Data de cadastro (H)</th>
+                  <th>Líder de área (J)</th>
+                  <th>Líder de IC (K)</th>
+                  <th>Outras áreas/ministérios (L)</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <div class="table-foot">
+            <span id="tableSummary">Carregando registros...</span>
+            <span>Scroll horizontal disponível no mobile</span>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const SHEET_ID = '1dellM3V5kBTXGA-Z386RjfOg8278g1r3HjPEcYFDdyU';
+    const SHEET_GID = '1076898492';
+    const POLL_INTERVAL_MS = 15000;
+    const EMBEDDED_CSV = "Escolha a op\u00e7\u00e3o,Nome completo,N\u00famerodeWhatsAppcomDDD,Estado civil,\"Caso seja casado, informar nome do c\u00f4njuge\",Batizado,Deseja ser volunt\u00e1rio em qual \u00e1rea ?,Carimbo de data/hora,Data de Nascimento,\"Caso seja l\u00edder de \u00e1rea, informe a \u00e1rea abaixo\",\"Caso seja l\u00edder de IC, informe o nome do IC abaixo:\",\"Caso sirva em mais uma \u00e1rea(s) ou minist\u00e9rio(s), informe abaixo:\"\nNovo Volunt\u00e1rio,J\u00falia lima Rodrigues,22998034790,Solterio,,Sim,Kids,4/1/26 15:39,,,,\nNovo Volunt\u00e1rio,Sueli da Concei\u00e7\u00e3o Ara\u00fajo,22988140176,Uni\u00e3o est\u00e1vel,Jo\u00e3o carlos trindade ferreira,Sim,Acolhimento,4/2/26 10:59,,,,\nMudan\u00e7a de \u00e1rea,Valdevir soares dos Santos Junior,22996086910,Casado no civil,Carla Aparecida Prud\u00eancio dos Santos,Sim,Consolida\u00e7\u00e3o,4/2/26 11:16,,,,\nNovo Volunt\u00e1rio,maria eduarda aud de lima,22997515833,Solterio,,Sim,M\u00eddia,4/2/26 19:46,,,,\nNovo Volunt\u00e1rio,Miguel Ramalho da silva,22981496333,Solterio,,Sim,Produ\u00e7\u00e3o,4/2/26 22:00,,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Esther andrade macedo,22981802736,Solterio,.,Sim,Store,4/3/26 12:00,8/17/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Flavia Damas Vieira,22999890206,Solterio,,Sim,Store,4/3/26 12:00,6/2/1975,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Taina Oliveira Azevedo,21989357691,Casado no civil,Gabriel,Sim,Store,4/3/26 12:05,8/9/2000,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",cec\u00edlia rodrigues da silva,22998490581,Casado no civil,alessandro Louren\u00e7o,Sim,Store,4/3/26 12:12,5/28/1981,,,Camarim\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Nathalie Mercedes,22981565629,Casado no civil,Matheus Mercedes,Sim,Consolida\u00e7\u00e3o,4/3/26 12:14,12/28/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Izabela Alves de Sousa,22974025718,Solterio,,Sim,Consolida\u00e7\u00e3o,4/3/26 12:15,5/3/1994,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Bruna Teixeira Barbosa Aguiar De Souza Pinto,22981027783,Casado no civil,Gabriel Aguiar De Souza Pinto,Sim,Consolida\u00e7\u00e3o,4/3/26 12:19,12/29/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alice Macedo Ribeiro da Silva,22992113632,Solterio,,Sim,Consolida\u00e7\u00e3o,4/3/26 12:20,4/15/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Glaucia Cristina Teixeira Rosa,22997167144,Casado no civil,Wanderson Rosa,Sim,Consolida\u00e7\u00e3o,4/3/26 12:20,9/28/1974,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Denis Alves de Lima Nascimento,22997929781,Casado no civil,Daniella Oliveira Alves,Sim,Store,4/3/26 12:24,7/15/1989,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daiane Gleise Siqueira Dias,22998552248,Casado no civil,Thiago Dias Duarte,Sim,Diaconia,4/3/26 12:25,9/11/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Nivea dos santos costa,22998570950,Casado no civil,Luiz Pereira,Sim,Consolida\u00e7\u00e3o,4/3/26 12:32,3/5/1986,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ueliton da Silva Ribeiro,22997199292,Solterio,,Sim,Store,4/3/26 12:34,9/30/1972,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jennyfer dos Santos Barbosa,22998704799,Casado no civil,Cleyton Barbosa Martins,Sim,Consolida\u00e7\u00e3o,4/3/26 12:40,11/27/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Elielton Coutinho Gomes,22997585782,Casado no civil,Sabrina Vasconcellos dos Reis Coutinho,Sim,Consolida\u00e7\u00e3o,4/3/26 12:42,9/5/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Roberta Silva Bastos Aires,27981159371,Solterio,,Sim,Store,4/3/26 12:51,4/4/1994,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Valeria Alves de Souza Costa,22988124107,Casado no civil,Denylson de Souza Costa,Sim,Consolida\u00e7\u00e3o,4/3/26 12:56,8/25/1980,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Leonardo Lima de Souza,22998983829,Solterio,,Sim,Consolida\u00e7\u00e3o,4/3/26 13:03,5/4/2007,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Anna Carolina Rachid de farias,22981778190,Solterio,,Sim,Consolida\u00e7\u00e3o,4/3/26 13:08,12/12/2013,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Julia Gabriela de Oliveira,22992567640,Solterio,,Sim,Store,4/3/26 13:25,5/22/1997,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",victoria da silva louren\u00e7o,22996197525,Solterio,,Sim,Store,4/3/26 13:33,5/18/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daniel Ant\u00e3o Dias,82987362071,Casado no civil,Maria Maura Leal Dias,Sim,Consolida\u00e7\u00e3o,4/3/26 13:40,12/25/1959,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rodrigo Sant'Anna da cunha,21990774852,Casado no civil,Tayza Freitas Sant'Anna,Sim,Transmiss\u00e3o,4/3/26 14:27,2/7/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kauan Santos de Carvalho,22988089711,Solterio,,Sim,Transmiss\u00e3o,4/3/26 14:30,2/14/2004,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Isayas Danyel Hildebrando Teles,22999324069,Solterio,,Sim,Transmiss\u00e3o,4/3/26 14:32,4/13/2007,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daniele Vieira Ara\u00fajo Anuncia\u00e7\u00e3o,22991012620,Casado no civil,Claudio Danilo Correia Anuncia\u00e7\u00e3o,Sim,Incluives,4/3/26 14:39,1/19/1981,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Luciana Ribeiro Mamede,21998547026,Casado no civil,Reinaldo Mamede Pereira,Sim,Consolida\u00e7\u00e3o,4/3/26 14:46,3/16/1982,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Thayza da Silva Oliveira Duarte,22997283455,Casado no civil,Bruno Duarte dos Santos,Sim,Kids,4/3/26 14:56,2/4/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Sophia dos santos martins silva,21982770732,Solterio,,Sim,Kids,4/3/26 14:56,3/23/2015,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Anna Livya Alves Machado,21972294471,Solterio,,Sim,Kids,4/3/26 14:57,7/15/2008,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Anna Karolina vieira Carneiro,22981182846,Solterio,,Sim,Kids,4/3/26 14:58,3/27/2008,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Isabella Ara\u00fajo Correia Anuncia\u00e7\u00e3o,22992241101,Solterio,,Sim,Kids,4/3/26 14:59,3/25/2010,,,\nNovo Volunt\u00e1rio,Ubiratan Marins Nunes,22992034163,Casado no civil,Maria da Concei\u00e7\u00e3o Simpl\u00edcio Sharma,Sim,Consolida\u00e7\u00e3o,4/3/26 14:59,8/27/1973,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriella Pinheiro de Souza,22998900245,Solterio,,Sim,Kids,4/3/26 15:00,12/3/2010,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",J\u00falia Deolindo Lima,21988636796,Solterio,,Sim,Kids,4/3/26 15:01,10/28/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Danielle Fernandes da Silva,21974655280,Solterio,,Sim,Kids,4/3/26 15:01,11/29/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Julia de oliveira Silva,22999520177,Solterio,,Sim,Kids,4/3/26 15:02,3/25/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Stephany Ara\u00fajo,22999745779,Solterio,,Sim,Kids,4/3/26 15:03,4/1/2000,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kaylanne Ferreira Da Silva,22981822641,Solterio,,Sim,Kids,4/3/26 15:04,7/18/2008,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Aline Carneiro,22997255476,Casado no civil,Jonas da Concei\u00e7\u00e3o Carneiro,Sim,Kids,4/3/26 15:05,8/28/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Cirlane Figueredo da Silva,21981650686,Casado no civil,Vangle,Sim,Kids Service,4/3/26 15:05,3/15/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ester dos Santos do Nascimento Braga,22997244006,Solterio,,Sim,Kids,4/3/26 15:06,10/6/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Lu\u00edsa Ferreira,22998498087,Solterio,,Sim,Kids,4/3/26 15:06,9/11/2005,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ana Clara Ramos Barreto,22988770297,Solterio,,Sim,Kids,4/3/26 15:07,7/19/2008,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rogeria Gaspar dos Santos,22999167104,Divorciada,,Sim,Kids,4/3/26 15:09,6/6/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Pedro Henrique Norberto Ferreira,22974040368,Solterio,,Sim,Transmiss\u00e3o,4/3/26 15:10,5/9/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabrielle Bianca Rocha dos Santos Torres,22992814632,Casado no civil,Israel de Almeida Torres Junior,Sim,Kids,4/3/26 15:11,10/17/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Lara Campanate,21983357723,Solterio,,Sim,Kids,4/3/26 15:13,5/1/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ana Aparecida Pereira Resende,22981520221,Casado no civil,Marcus Axel dos Santos Pereira Soares,Sim,Consolida\u00e7\u00e3o,4/3/26 15:14,12/21/1998,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Eduarda Alves Pereira,21972358418,Morando Junto,,Sim,Kids,4/3/26 15:18,5/26/1998,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Cristiane Vit\u00f3ria Martins da Silva,22997570307,Solterio,,Sim,KIDS,4/3/26 15:23,7/13/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Mateus Costa de Souza,22998570750,Casado no civil,Jaqueline,Sim,Consolida\u00e7\u00e3o,4/3/26 15:28,2/25/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Pedro Henrique da Silva Gon\u00e7alves,22998362005,Solterio,,Sim,Transmiss\u00e3o,4/3/26 15:29,1/11/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Karoline Barboza Giordano Ferreira,22988339106,Casado no civil,Felipe Ismael de Campos Ferreira,Sim,Kids,4/3/26 15:29,4/13/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriela Mendon\u00e7a,22999950708,Solterio,,Sim,Kids,4/3/26 15:30,5/14/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Hemylyn Jessica Godoi Barenco,22988256103,Casado no civil,Thailander Ubirajara F\u00e9lix Barenco,Sim,Kids,4/3/26 15:32,7/9/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rafhaely Barbosa Palmares Almeida,22998274950,Solterio,,Sim,Kids,4/3/26 15:33,5/18/2011,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriel Azevedo,22997298239,Casado no civil,Thayna Ferreira,Sim,Transmiss\u00e3o,4/3/26 15:34,6/10/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabryela dos santos soares,22992738306,Solterio,,Sim,Kids,4/3/26 15:37,11/8/2013,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Marcio romulo,22997113961,Casado no civil,Mariele Azevedo,Sim,Transmiss\u00e3o,4/3/26 15:41,1/14/1997,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Fernanda do Carmo Fran\u00e7a,22997250576,Casado no civil,Aladim de Souza Guimar\u00e3es,Sim,Incluives,4/3/26 15:45,8/30/1979,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Hemelly Rodrigues de Ara\u00fajo,21992942322,Solterio,,Sim,Kids,4/3/26 15:47,3/17/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Eduarda Domingues,22988457764,Solterio,,Sim,Kids,4/3/26 15:50,3/6/2010,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Emanuelly rodrigues de araujo,22992906788,Solterio,,Sim,Kids,4/3/26 15:51,5/14/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Barbara Sales,22981483927,Casado no civil,,Sim,Kids,4/3/26 15:52,4/18/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Guilherme lo giudice Negromonte,21973084497,Solterio,,Sim,Kids,4/3/26 15:53,12/19/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Thissiane Bahia Lo Giudice Negromonte,21966835728,Casado no civil,Douglas Soares Negromonte,Sim,Kids,4/3/26 15:55,5/6/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",ana carolina pacheco valladares,92981112559,Solterio,,Sim,Kids,4/3/26 15:56,4/14/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Nat\u00e1lia Porfirio Pereira Gouveia,21980560064,Casado no civil,Maicon rosa Gouveia dos santos,Sim,Kids,4/3/26 15:59,5/20/1994,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Michele Rodrigues Bernardo da Costa,22998256102,Vi\u00fava,,Sim,Kids Service,4/3/26 16:27,3/14/1977,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",KARLA REGINA NUNES FO NASCIMENTO,22999138722,Solterio,,Sim,Kids Service,4/3/26 16:32,9/14/1964,,,\nNovo Volunt\u00e1rio,Ana Sofia Pereira Camilo,21970979997,Solterio,,Sim,Kids,4/3/26 16:42,10/27/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",W\u00e9lia Rangel,22997727552,Casado no civil,CHRYSTIAN RANGEL,Sim,Kids Service,4/3/26 16:46,9/18/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Josyane do Nascimento Ferreira Viana,22999118905,Casado no civil,Luis Miguel Macedo Viana,Sim,Kids Service,4/3/26 16:46,1/17/1989,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Mirelle de faria marques barreto,22988229244,Casado no civil,Erick Motta Barreto,Sim,Kids Service,4/3/26 16:57,6/29/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Eliza Silva Sousa,22988267466,Solterio,,Sim,Kids,4/3/26 17:06,11/5/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Michele de Souza Gomes Pinto dos Santos,22997550555,Casado no civil,Wallace Pinto dos Santos,Sim,Kids Service,4/3/26 17:15,2/1/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alef Benjamim Tavares da Silva,22998245035,Solterio,,Sim,Kids,4/3/26 17:18,4/4/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ana vit\u00f3ria Ferrari,22998301307,Solterio,,Sim,Kids,4/3/26 17:19,8/30/2007,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ana Cristina Neves de Lima,22997925168,Divorciada,,Sim,Kids Service,4/3/26 17:20,4/28/1969,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Reynaldo Ribeiro Mamede,22997610271,Solterio,,Sim,Kids Service,4/3/26 17:22,11/7/2013,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Amanda Oliveira Mendon\u00e7a,22999173133,Solterio,,Sim,Kids Service,4/3/26 17:23,1/11/2007,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kyrya Sury Duarte de Azeredo Queiroz Freire,22998076537,Solterio,,Sim,Kids Service,4/3/26 17:26,10/31/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Helena Aud Macedo,22997785600,Solterio,,Sim,Kids,4/3/26 17:35,8/1/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Chrystian dos Santos Rangel,22999148263,Casado no civil,Welia Stephany Alc\u00e2ntara Tavares Rangel,Sim,Kids Service,4/3/26 17:44,5/6/1998,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",C\u00e1ssia de souza oliveira de Andrade,22999263091,Casado no civil,Roberto soares Vieira de Andrade,Sim,Kids Service,4/3/26 17:46,12/9/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rafaela de Souza Carvalho,22981701074,Casado no civil,Jefferson dos Reis Oliveira,Sim,Kids Service,4/3/26 17:52,7/1/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Mait\u00ea de Souza Azeredo,22998588419,Solterio,,Sim,Kids,4/3/26 18:10,7/10/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ana Lissy de Azevedo dos Santos Viana,22988196641,Solterio,,Sim,Kids,4/3/26 18:14,5/18/2010,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Mara Regina Cucco Pereira,22974041237,Divorciada,,Sim,Kids Service,4/3/26 18:23,8/31/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Leani Cottini,\u202a22997634228\u202c,Casado no civil,Djalma Barbosa de Assun\u00e7\u00e3o,Sim,Kids Service,4/3/26 18:42,7/11/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jefferson dos Reis Oliveira,22981609368,Casado no civil,Rafaela de Souza Carvalho,Sim,Kids Service,4/3/26 19:16,5/8/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rosimar luiz da costa,22988289358,Casado no civil,Paulo Roberto da costa,Sim,Kids,4/3/26 19:33,4/22/1975,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Paulo Roberto da Costa,22988448690,Casado no civil,Rosimar Luiz da Costa,Sim,Kids,4/3/26 19:35,4/29/1978,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Melyssa Cardoso dos Santos,22998090417,Casado no civil,Renato de Farias,Sim,Kids,4/3/26 19:45,1/25/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Renato de Farias Silva,22988753510,Casado no civil,Melyssa Cardoso,Sim,Kids,4/3/26 19:46,7/21/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Miguel Terra Martins,21974483940,Casado no civil,Giulia Terra Martins,Sim,Kids Service,4/3/26 19:47,5/7/2001,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Giulia Terra Martins,22992683805,Casado no civil,Miguel Terra Martins,Sim,Kids Service,4/3/26 19:49,3/9/2002,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Michelle de Oliveira Marciano Mendon\u00e7a,22997403425,Casado no civil,Adriano Garcia,Sim,Kids Service,4/3/26 19:56,5/21/1982,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Analia Paulo Ginuino,22974064386,Casado no civil,Felipe Martins Felismino,Sim,Kids Service,4/3/26 20:00,7/30/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jessica Figueredo,21980654071,Casado no civil,Haine gomes de lima,Sim,M\u00eddia,4/3/26 20:50,12/1/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gustavo Luiz Dias Ferreira,22997633258,Casado no civil,Yasmin Peralva Ferreira,Sim,Kids,4/3/26 20:54,5/27/1989,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Yasmin Peralva Ferreira,22992788071,Casado no civil,Gustavo Luiz Dias Ferreira,Sim,Kids,4/3/26 21:00,11/24/1997,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Andrea Trindade Martins,23998536625,Divorciada,,Sim,Kids,4/3/26 21:53,3/18/1980,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jo\u00e3o Pedro Vasconcellos Gomes,22997931976,Solterio,,Sim,Kids,4/3/26 22:11,8/13/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Isabela Tinoco Cunha Oliveira,22992732301,Solterio,,Sim,Kids,4/3/26 23:20,5/3/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Danielle de Faria marques Pereira,22998499812,Casado no civil,Miqueias Pedrosa Pereira,Sim,Kids,4/4/26 7:22,4/18/1977,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Scarlet Guimar\u00e3es \u00c1vila,21979542940,Uni\u00e3o est\u00e1vel,Yuri Bezerra de Souza,N\u00e3o,Kids,4/4/26 7:23,3/31/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria C S Sharma,21974891578,Casado no civil,Ubiratan Marins Nunes,Sim,Consolida\u00e7\u00e3o,4/4/26 9:09,10/3/1975,,,\nMudan\u00e7a de \u00e1rea,Luiz Miguel,22992796206,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 10:14,5/31/2010,,,\nMudan\u00e7a de \u00e1rea,Yan leal dias leite,74999173001,Solterio,,Sim,T\u00e9cnica,4/4/26 10:23,1/30/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alice Cec\u00edlia Lopes Oliveira,22992446872,Solterio,,Sim,Kids,4/4/26 10:25,3/14/2011,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Pietra pinheiro Gomes,21991993255,Solterio,,Sim,Kids,4/4/26 10:29,8/1/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Erick Motta barreto,22981554218,Casado no civil,Mirelle de Faria marques barreto,Sim,Produ\u00e7\u00e3o,4/4/26 10:39,11/10/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Filipe Da Silva Santos,22996126583,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 10:41,1/13/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Caio de Souza mesquita,22997892637,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 10:50,8/12/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Matheus Ver\u00edssimo,22981180164,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 11:03,12/16/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Pietra Crichigno Pereira,21999521327,Solterio,,Sim,Kids,4/4/26 11:28,6/27/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Miguel Azevedo de sousa,22988339636,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 11:45,2/2/2011,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Antonio marcos cariri dos santos,22992436964,Casado no civil,Valdissy verissimo cariri dos santos,Sim,KIDS,4/4/26 12:27,10/23/1976,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Carlos Henrique Rachid,22981559037,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 13:42,2/10/2010,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alan da Silva Sousa,22996017006,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 14:57,3/28/1988,,,\nNovo Volunt\u00e1rio,CARLENE Feitoza Garcia,22988100394,Casado no civil,Rozineli Garcia de Souza,Sim,Diaconia,4/4/26 16:26,5/16/1982,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Patricia Vieira Silva,31985291662,Casado no civil,An\u00edzio Silva,Sim,Consolida\u00e7\u00e3o,4/4/26 17:26,7/2/1971,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Vanessa laranjeira de Brito huguenin,22988575025,Casado no civil,Jo\u00e3o Marcos P D Huguenin Tavares,Sim,Consolida\u00e7\u00e3o,4/4/26 17:47,10/20/2002,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Arthur Dias Brum louren\u00e7o,22992329271,Solterio,,Sim,Produ\u00e7\u00e3o,4/4/26 18:05,3/5/2007,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Aline da Silva quintanilha,22999738855,N\u00e3o casada no papel,Deivid da Silva,Sim,Consolida\u00e7\u00e3o,4/4/26 18:20,8/28/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriela de Oliveira Cartaxo Pinheiro,22992188524,Solterio,,Sim,Consolida\u00e7\u00e3o,4/4/26 18:45,9/28/1984,,,\nMudan\u00e7a de \u00e1rea,Ana Carolina da Silva C\u00e2mara,22998198710,Casado no civil,Alexandre,Sim,Kids,4/4/26 20:41,5/9/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Anthonela Ferreira,22996159817,Solterio,,N\u00e3o,Kids,4/4/26 21:44,8/6/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Marcus Axel dos Santos Pereira Soares,21965376124,Casado no civil,Ana Aparecida Pereira Resende,Sim,Store,4/5/26 9:32,2/25/1995,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Silas Rocha da Silva,22998023313,Casado no civil,Nath\u00e1lia,Sim,T\u00e9cnica,4/5/26 12:26,1/30/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Eduarda Cardoso Benjamin,21974853267,Solterio,,Sim,Kids,4/5/26 12:50,1/26/2009,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Patrick Macedo da Silva,22981001346,Casado no civil,Ana Clara dos Santoa Figueiredo da Silva,Sim,Kids Service,4/5/26 13:56,3/29/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Anna Clara Vieira Carneiro,22996180315,Solterio,,Sim,Consolida\u00e7\u00e3o,4/5/26 17:08,3/16/2005,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daniella Alves,22997724304,Casado no civil,Denis Alves,Sim,Store,4/6/26 19:39,9/20/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Larissa da Silva Santiago,22999438214,Casado no civil,Jackson,Sim,Store,4/6/26 19:47,6/3/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jackson Vinicius Motta de Oliveira,22974006803,Casado no civil,Larissa Santiago de Oliveira,Sim,Store,4/6/26 20:21,8/24/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",P\u00e2mela de Souza Meireles,21980020702,Casado,Jackson Nascimento Rieger,Sim,Store,4/6/26 21:19,8/31/1980,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",ANDERSON CRUZ AZEVEDO,22997843994,Casado no civil,D\u00c9BORA CABRAL PIRASOL AZEVEDO,Sim,Store,4/6/26 22:08,10/23/1980,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Charlene Vidal de Sousa Brito,21967279394,Casado no civil,Walmir Mendes de Brito,Sim,Store,4/6/26 22:19,1/13/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Miguel Vidal de Sousa e Silva,21998765488,Solterio,,Sim,Store,4/6/26 22:19,8/6/2010,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Val\u00e9ria Soares de Oliveira Vieira,21981698820,Casado no civil,Edson Ferreira Vieira,Sim,Store,4/6/26 23:07,6/2/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jo\u00e3o Marcos Pinheiro Domiciano Huguenin Tavares,21969559005,Casado no civil,Vanessa Laranjeira de Brito Huguenin,Sim,Consolida\u00e7\u00e3o,4/7/26 8:59,12/3/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Shailane ventura,47988025231,Casado no civil,Marcos Vin\u00edcius Ferreira,Sim,Acolhimento,4/7/26 9:13,4/10/1989,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Joseani dos santos soares,22992044847,Casado no civil,Sinezio moreira dos santos,Sim,Acolhimento,4/7/26 9:14,3/19/1986,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",\u00c1gatha Caroline de Paula Silva Mesquita,21987394454,Casado no civil,Felipe da Silva Mesquita,Sim,Acolhimento,4/7/26 9:18,3/29/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rosana de Souza Santos,22999442239,Solterio,,Sim,Acolhimento,4/7/26 9:21,2/15/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Michele moreno da Silva Faria,22998448507,Casado no civil,Renato Nascimento Faria,Sim,Acolhimento,4/7/26 9:25,5/5/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Laisa de Souza Concei\u00e7\u00e3o,22997092747,Casado no civil,Paulo,Sim,Consolida\u00e7\u00e3o,4/7/26 9:49,1/13/2003,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Beatriz Vieira da Concei\u00e7\u00e3o,22996174007,Casado no civil,Aldemir da Concei\u00e7\u00e3o,Sim,Acolhimento,4/7/26 9:53,5/9/1968,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Lucila da concei\u00e7\u00e3o Guimar\u00e3es Gomes,22992892446,Casado no civil,Eduardo,Sim,Acolhimento,4/7/26 9:54,10/24/1962,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rono Bouckhorny Muzy,22992213512,Casado no civil,,Sim,Voluntariado,4/7/26 10:03,11/2/1976,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rosemari Marinho Andr\u00e9,22997079468,Solterio,,Sim,Voluntariado,4/7/26 10:04,2/5/1978,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",C\u00e1tia Regina dos Santos Fernandes,22992165938,Casado no civil,Carlos Alexandre da Silva Fernandes,Sim,Acolhimento,4/7/26 10:06,9/29/1974,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Katelyn Rodrigues Cardozo,22997566080,Casado no civil,Heber Oliveira Freitas,Sim,Kids Service,4/7/26 10:21,1/22/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alexandre da Silva guimaraes,22992232634,Solterio,,Sim,Recep\u00e7\u00e3o,4/7/26 10:25,12/12/1995,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Thabita Moreira da Silva,22981030592,Solterio,,Sim,Recep\u00e7\u00e3o,4/7/26 10:26,6/30/1992,,IC ITEENS 11/12 anos,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Vanessa Alves Hollanda dos santos,21984755587,Casado no civil,Erick Hollanda dos Santos,Sim,Recep\u00e7\u00e3o,4/7/26 10:27,7/17/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rayssa Moreira de Souza,21970063644,Casado no civil,Mateus de Sousa Ferreira,Sim,Recep\u00e7\u00e3o,4/7/26 10:27,10/1/1998,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Cicera Gon\u00e7alves do Nascimento,21995141250,Casado no civil,Fabio dos Santos Azevedo,Sim,Acolhimento,4/7/26 10:27,10/15/1971,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Adriao Garcia Mendon\u00e7a,22998438828,Casado no civil,Michelle de Oliveira marciano Mendon\u00e7a,Sim,Kids Service,4/7/26 10:31,11/20/1977,KIDS Service,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Elaine Mon\u00e7\u00e3o,22996091909,Casado no civil,Alex Braz,Sim,Recep\u00e7\u00e3o,4/7/26 10:35,9/28/1982,,IC MULHERES NOVA S\u00c3O PEDRO,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Andrea Rodrigues de Araujo,22991025466,Divorciada,,Sim,Acolhimento,4/7/26 10:40,11/24/1974,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daiany Queiros da Rocha Tavares,22992660778,Casado no civil,Hernando Frutuoso dos santos,Sim,Produ\u00e7\u00e3o,4/7/26 10:43,6/25/1990,Produ\u00e7\u00e3o,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kauan Noronha de Freitas,22988398942,Solterio,,Sim,Produ\u00e7\u00e3o,4/7/26 10:46,11/26/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Vitoria Trindade Quinze Dias Almeida,22998112189,Casado no civil,Kalebe Gomes Quinze Dias Almeida,Sim,Recep\u00e7\u00e3o,4/7/26 10:48,11/1/1999,,IC CNNT S\u00e3o Crist\u00f3v\u00e3o,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Stefanny Motta,22988611461,Casado no civil,,Sim,Recep\u00e7\u00e3o,4/7/26 10:51,9/26/1997,Recep\u00e7\u00e3o,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Aimee Barbosa de Souza,22991020633,Solterio,,Sim,Store,4/7/26 10:54,11/3/1990,,,\nMudan\u00e7a de \u00e1rea,Caio de Abreu,22998935723,Solterio,,Sim,Transmiss\u00e3o,4/7/26 10:56,2/3/2011,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Esiete Pereira Francisco,21984528756,Casado no civil,Lelis Nogueira Francisco,Sim,Recep\u00e7\u00e3o,4/7/26 10:58,10/24/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Renata Barreto,22988079275,Casado no civil,Victor Motta Barreto,Sim,Recep\u00e7\u00e3o,4/7/26 11:06,2/18/1989,Recep\u00e7\u00e3o,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Karolyn Messias de souza,22997223360,Casado no civil,Regis,Sim,Acolhimento,4/7/26 11:07,1/25/1995,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Tha\u00eds Pinheiro de Oliveira Macedo,22988083229,Casado no civil,Carlos Eduardo da Silva Macedo Santos,Sim,Produ\u00e7\u00e3o,4/7/26 11:08,5/2/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Barbara Pinheiro dos Santos,21991993355,Casada na igreja cat\u00f3lica,Leonardo Alves,Sim,Acolhimento,4/7/26 11:08,12/2/1985,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Hernando Frutuoso dos santos,21972583846,Casado no civil,Daiany Queir\u00f3s da Rocha Tavares,Sim,Produ\u00e7\u00e3o,4/7/26 11:08,8/21/1986,Produ\u00e7\u00e3o,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Mirian Maria da Silva da Fonseca,21993791981,Casado no civil,M\u00e1rcio Felipe cepero da Fonseca,Sim,Kids,4/7/26 11:09,5/6/1981,KIDS,,\nMudan\u00e7a de \u00e1rea,Pollyanna Padovani,22981287600,Divorciada,,Sim,Kids,4/7/26 11:10,4/6/1982,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Val\u00e9ria da Silva Oliveira Lopes,22992726396,Div\u00f3rciada,,Sim,Recep\u00e7\u00e3o,4/7/26 11:11,6/23/1979,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rog\u00e9rio Dutra da Cunha,22988249516,Casado no civil,Dan\u00fazia Viana dos Santos Dutra,Sim,Produ\u00e7\u00e3o,4/7/26 11:14,7/6/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Eliane Lopes Lima,22999977739,Divorciado,,Sim,Recep\u00e7\u00e3o,4/7/26 11:19,3/19/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",EDSON FERREIRA VIEIRA,21981357203,Casado no civil,VAL\u00c9RIA SOARES DE OLIVEIRA VIEIRA,Sim,Store,4/7/26 11:23,11/2/1978,Store,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",D\u00e9bora Cabral Pirasol Azevedo,22997889369,Casado no civil,Anderson Cruz Azevedo,Sim,Store,4/7/26 11:26,8/2/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Maria Jos\u00e9 de Oliveira Marciano,22997037723,Vi\u00fava,Jos\u00e9 Roberto,Sim,Kids Service,4/7/26 11:27,5/4/1950,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jackson nascimento Rieger,22999543431,Uni\u00e3o est\u00e1vel,Pamela de Souza Meireles,Sim,Store,4/7/26 11:35,5/13/1977,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",M\u00e1rcia Cristina de S\u00e1 Ver\u00edssimo,22997515064,Viuva,,Sim,Recep\u00e7\u00e3o,4/7/26 11:36,9/27/1967,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Thais Alves dos Santos narciso,21983320744,Casado no civil,Julio C\u00e9sar,Sim,Kids,4/7/26 11:41,5/23/1994,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Adriano Ferreira Dos Santos,22996145388,Casado no civil,Tha\u00eds Cristina Valad\u00e3o Castello,Sim,Recep\u00e7\u00e3o,4/7/26 11:45,10/26/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Julia Figueredo,21983589314,Solterio,,N\u00e3o,Acolhimento,4/7/26 11:55,5/10/2000,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Quelli do Nascimento silva bandeira,22992557927,Casado no civil,Alysson Jos\u00e9 de sousa bandeira,Sim,Acolhimento,4/7/26 12:06,10/28/1983,Acolhimento,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Vanessa Tavares Portilho,22981872038,Solterio,,Sim,Consolida\u00e7\u00e3o,4/7/26 12:06,9/12/1997,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jo\u00e3o Vitor Valente Moreno,22997998103,Solterio,,Sim,Store,4/7/26 12:10,5/11/2001,,Parque Estoril,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Josineia Fidelis dos santos,22998812421,Casado no civil,Josemar bageston dos santos,Sim,Acolhimento,4/7/26 12:26,3/15/1974,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",T\u00e2nia Maria Frias Coelho,22988273575,Casado no civil,Luiz Henrique da Motta Coelho,Sim,Diaconia,4/7/26 12:32,7/4/1978,Diaconia,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Samuel David Ramos de Lima,22992329567,Solterio,,Sim,Produ\u00e7\u00e3o,4/7/26 12:33,10/20/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rebekah Mendon\u00e7a da Silva Lopes,22997829539,Casado no civil,Leonardo da Concei\u00e7\u00e3o Lopes,Sim,Diaconia,4/7/26 12:38,7/5/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Talita da Silva Dias,21993745630,Solterio,,Sim,Diaconia,4/7/26 12:44,7/6/1987,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Edson Gomes Soares,22992522280,Casado no civil,Arlete Moreira Soares,Sim,Diaconia,4/7/26 12:47,12/4/1956,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Cristiane da Silveira Lima,22997249663,Divorciada,,Sim,Diaconia,4/7/26 12:56,4/25/1972,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",La\u00e9rcio Vicente da Silva,22992784405,Casado no civil,Lourdes de Freitas Duarte,Sim,Diaconia,4/7/26 12:56,3/1/1983,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriel Souza Coelho,22999353779,Solterio,N\u00e3o,Sim,Kids Service,4/7/26 13:05,9/22/2006,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Adriel Alves da Silva P\u00f3voas,22992450911,Casado no civil,Camila P\u00f3voas de Souza,Sim,Diaconia,4/7/26 13:11,10/23/1988,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Carlos Augusto Camilo Baptista,21974996778,Casado no civil,Emarta lima da s Baptista,Sim,Diaconia,4/7/26 13:21,5/19/2026,,Homens de Desenvolvimento,\nNovo Volunt\u00e1rio,Raquel Gon\u00e7alves,21970421006,Moro junto,Willians Torres,Sim,Acolhimento,4/7/26 13:21,9/9/2026,,Esta\u00e7\u00e3o,\nMudan\u00e7a de \u00e1rea,Juliana Silva viana,22097455192,Casado no civil,Alexandre Vieira,Sim,A\u00e7\u00e3o Social,4/7/26 13:25,10/13/1987,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Daniella Leal Dias Gon\u00e7alves,74999990902,Casado no civil,Ewerton Jorge Gon\u00e7alves de Lima,Sim,Acolhimento,4/7/26 13:25,2/9/1984,Acolhimento,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",ELAINE BARBOSA LIMA SILVA,22988585748,Vi\u00fava,,Sim,Diaconia,4/7/26 13:29,6/27/1967,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Elenir da Cunha Carvalho Mata,21989103513,Casado no civil,Jos\u00e9 Jacques Mata,Sim,A\u00e7\u00e3o Social,4/7/26 13:29,7/27/1964,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Marcelo da Silva Souza,22992754320,Casado no civil,Gerlane Tavares Dias da Silva,Sim,M\u00eddia,4/7/26 13:29,2/22/1982,Diaconia,Ic Baixo Grande,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Larissa dos Santos,22988155721,Uni\u00e3o est\u00e1vel,Marlon,Sim,Acolhimento,4/7/26 13:33,5/23/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alessandro dos Santos Louren\u00e7o,22997676068,Casado no civil,Cec\u00edlia Rodrigues da silva,Sim,Diaconia,4/7/26 13:39,7/15/1977,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Evellyn Araujo Damaceno,22997345891,Solterio,,Sim,Acolhimento,4/7/26 13:41,2/27/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Miguel Kevin dos Santos Neves,22998431403,Casado no civil,Dalila Daiana,Sim,Diaconia,4/7/26 13:48,5/27/1992,,Supervisor ICs mistas,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Alexandre Gomes Hanthequeste,22999128831,Casado no civil,Renata de Rezende Hanthequeste,Sim,Voluntariado,4/7/26 14:13,11/14/1984,,Viverde I,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Marcos Vin\u00edcius Silva Rodrigues,21994613606,Casado no civil,Taisa Lima da Silva,Sim,Diaconia,4/7/26 14:24,2/21/1993,,IC Mista Bela Vista 2,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Luane Abreu Lessa,22999599409,Casado no civil,Ely da Silva Lessa J\u00fanior,Sim,Diaconia,4/7/26 14:40,5/10/1986,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Camila P\u00f3voas de Souza,22988518227,Casado no civil,Adriel Alves da Silva P\u00f3voas,Sim,Diaconia,4/7/26 14:45,03/07/0089,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Tha\u00eds Nogueira de Carvalho,22981376202,Casado no civil,Renan da Costa de Souza,Sim,Voluntariado,4/7/26 14:46,1/2/1996,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Thiago Dias Duarte,22981647545,Casado no civil,Daiane Gleise Siqueira Dias,Sim,Diaconia,4/7/26 14:52,4/7/1988,Diaconia,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Tatiane Salles de S\u00e1 Augusto,22997630488,Casado no civil,Vanderli da Silva Augusto,Sim,Diaconia,4/7/26 14:52,1/4/1981,,,\nMudan\u00e7a de \u00e1rea,Samuel Coelho de Ar\u00eades,22981620288,Solterio,,Sim,Incluives,4/7/26 14:55,11/1/2010,IncluIVES,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Sulamita do Nascimento Silva Sampaio,22998408765,Casado no civil,Jhoni Sampaio Pinto,Sim,Produ\u00e7\u00e3o,4/7/26 15:00,1/19/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriel Filipe,22997740297,Solterio,,Sim,Produ\u00e7\u00e3o,4/7/26 15:05,3/20/2000,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",\u00c9rica Simone Santos Ferreira,22988384219,Casado no civil,Leonardo de Souza Santos,Sim,Diaconia,4/7/26 15:11,11/24/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Geferson da Silva de Oliveira David,22992548903,Casado no civil,Claudia Camila David Ramos de Lima da Silva,Sim,Produ\u00e7\u00e3o,4/7/26 15:13,12/14/1993,,Campo redondo,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kelly Carvalho Cardoso,22988350649,Divorciada,,Sim,Diaconia,4/7/26 15:21,4/22/1997,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jamyne Gomes Sant' Anna da Silva Lusquini,22998986113,Casado no civil,Jos\u00e9 Newton Lusquini Motta Peres,Sim,Diaconia,4/7/26 15:33,2/28/1992,,Jovens Casados - Bairro S\u00e3o Jo\u00e3o,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jos\u00e9 Newton Lusquini,22981255385,Casado no civil,Jamyne Lusquini,Sim,Diaconia,4/7/26 15:50,6/5/1992,,Jovens Casados - BSJ,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rogeria Rosa de Azevedo de Oliveira,22996002543,Casado no civil,Daniel Luiz Silva de Oliveira,Sim,Diaconia,4/7/26 15:52,4/7/2026,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Camila de Oliveira Baptista da silva,21993865076,Casado no civil,Ramon Baptista da Silva,Sim,Diaconia,4/7/26 16:11,8/20/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Dayana Rodrigues de Ara\u00fajo,21975697379,Casado no civil,Ricardo Ara\u00fajo,Sim,Diaconia,4/7/26 16:23,7/29/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Jaqueline Silva,22992410389,Solterio,,Sim,Recep\u00e7\u00e3o,4/7/26 16:30,7/2/1979,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",C\u00e1ssia maria da rocha,21998962828,Divorciada,,Sim,Voluntariado,4/7/26 16:30,7/31/1969,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Nat\u00e1lia Campos Alves Mathias,22981368236,Uni\u00e3o est\u00e1vel,George Martins do Rio Neto,Sim,Diaconia,4/7/26 16:35,11/7/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Dan\u00fazia Dutra,22998163454,Casado no civil,Rog\u00e9rio Dutra,Sim,Produ\u00e7\u00e3o,4/7/26 17:42,4/7/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Cleide Ramalho da Silva Evangelista,22992140490,Casado no civil,Ozeias Evangelista,Sim,Produ\u00e7\u00e3o,4/7/26 17:57,9/20/1975,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Carlos Daniel Silva Duarte,21973142371,Solterio,,Sim,Produ\u00e7\u00e3o,4/7/26 19:24,1/7/2001,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Claudia EUNICE ABREU BOUSQUET,21966513449,Solterio,,Sim,Recep\u00e7\u00e3o,4/7/26 19:58,11/11/1973,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ely da Silva Lessa J\u00fanior,22998387683,Casado no civil,Luane Abreu Lessa,Sim,Diaconia,4/7/26 20:05,3/1/1977,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Luiz Henrique da Motta Coelho,21996064631,Casado no civil,T\u00e2nia Maria Frias Coelho,Sim,Diaconia,4/7/26 20:15,9/7/1967,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",L\u00edvia Cardozo de Melo,21986497073,Solterio,,N\u00e3o,Kids,4/7/26 20:32,5/3/2014,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",B\u00e1rbara Ferreira de Oliveira Fumian,22998370298,Casado no civil,Italo Souza Fumian,Sim,Kids,4/8/26 7:25,6/15/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Sarah Gon\u00e7alves Monteiro,22999785384,Solterio,,Sim,Acolhimento,4/8/26 9:31,6/16/2001,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Elaine Porto Valad\u00e3o Muzy,22997780541,Casado no civil,Rono Muzy,Sim,Acolhimento,4/8/26 9:45,7/8/1979,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gleicianne Soares Ferreira Mendon\u00e7a,21999843402,Casado no civil,Eduardo,Sim,Acolhimento,4/8/26 10:03,6/27/1987,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Hosana de Souza Cunha Leite,21970343573,Casado no civil,Cleber Soares de Melo Leite,Sim,Acolhimento,4/8/26 10:25,10/14/1975,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Eduardo Mendon\u00e7a de Oliveira Correia,21969190070,Casado no civil,Gleicianne Soares,Sim,Acolhimento,4/8/26 10:47,1/17/1984,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Luiza Ara\u00fajo Marques,22997470276,Solterio,,Sim,Store,4/8/26 12:25,11/10/1986,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Erick hollanda dos Santos,21995777076,Casado no civil,Vanessa,Sim,Estacionamento,4/8/26 13:15,8/7/1980,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Kenia Miranda Gaby,22999009878,Solterio,,Sim,Kids,4/8/26 13:18,8/28/1982,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",M\u00e1rcia Mattos de Campos,21976508585,Divorciada,,Sim,Recep\u00e7\u00e3o,4/8/26 13:21,10/8/1965,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Evellyn Bessa de Souza,31991759775,Solterio,,Sim,Estacionamento,4/8/26 19:07,12/5/1991,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Esthev\u00e3o de Ara\u00fajo Danaceno,22997297265,Solterio,,N\u00e3o,Kids,4/8/26 23:32,7/25/2012,,,\nNovo Volunt\u00e1rio,Tamirys dos Santos Paes Rezende,22999827142,Casado no civil,Leandro Caetano Rezende,Sim,Incluives,4/9/26 11:13,1/6/1990,,,\nNovo Volunt\u00e1rio,Leandro Caetano Rezende,22999494758,Casado no civil,Tamirys dos Santos Paes Rezende,Sim,Incluives,4/9/26 11:15,6/12/1987,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Miguel Andr\u00e9 dos Santos,21996990406,Solterio,,Sim,Kids,4/9/26 18:56,6/4/2012,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Renata de Rezende Hanthequeste,22999829902,Casado no civil,Alexandre Hanthequeste,Sim,Voluntariado,4/10/26 13:38,2/20/1988,,Viverde Misto,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Karoline esthefani soares de souza,22997973536,Casado no civil,Leonardo souza,Sim,Voluntariado,4/10/26 15:52,5/17/1999,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ketellen Amaral,22997071629,Casado no civil,Leonardo Marques,Sim,Voluntariado,4/10/26 16:47,12/4/1990,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Ren\u00e3 da costa de souza,22988761473,Casado no civil,Thais Nogueira de Carvalho,Sim,Voluntariado,4/10/26 17:14,6/9/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Olmir Martins de Oliveira Junior,21979068546,Casado no civil,Aline Campanate de Oliveira,Sim,Voluntariado,4/11/26 9:11,4/29/1981,Voluntariado,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Aline Campanate de Oliveira,21964458014,Casado no civil,Olmir Martins de Oliveira Junior,Sim,Voluntariado,4/11/26 9:13,9/20/1984,Voluntariado,,\nNovo Volunt\u00e1rio,Marcio Gabriel Gomes Cartaxo,22999945695,Solteiro,,N\u00e3o,Store,4/11/2026,,,,\nNovo Volunt\u00e1rio,Anderson Abreu,21964354708,Casado no Civil,Raquel dos Santos da Paix\u00e3o,Sim,Estacionamento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Raquel Santos da Paix\u00e3o,21964895972,Casado no Civil,Anderson Felizardo de Abreu,Sim,Estacionamento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ana Carolina Pacheco Valladares,9281112559,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Andr\u00e9a Trindade Martins,22998536625,Divorciada,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Elizabeth Cristina P Cardoso,22996172111,Solteiro,,N\u00e3o,Acolhimento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Samuel Valad\u00e3o Castello Ferreira dos Santos,22998311852,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,M\u00e9lanie Cortes dos Santos,22998003953,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Thais Cristina Valad\u00e3o Castello,22996190544,Casado no Civil,Adriano Ferreira dos Santos,Sim,Recep\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Carlos Magno Ribeiro Ferreira,21996686769,N\u00e3o informado se casado no civil,Natalia de Souza Le\u00e3o,Sim,Diaconia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Anna Clara,22999998081,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Beatriz,22999999728,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Natalia de Souza Le\u00e3o,22998515685,N\u00e3o informado se casado no civil,Carlos Magno Ribeiro Ferreira,Sim,Intercess\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Renan da Silva Sim\u00f5es,22974012276,Casado no Civil,Mar\u00edlia da Motta Silva Sim\u00f5es,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Mar\u00edlia da Motta Silva Sim\u00f5es,22999671270,Casado no Civil,Renan Silva Sim\u00f5es,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Alex Sandro Leal da Silveira Delmiro,22988499375,Casado no Civil,Luanda Janaiara Delmiro Pessoa Leal,Sim,IncluIVES,4/11/2026,,,,\nNovo Volunt\u00e1rio,Luanda Janaiara Delmiro Pessoa Leal,22988058278,Casado no Civil,Alexsandro Leal da Silveira Delmiro,Sim,IncluIVES,4/11/2026,,,,\nNovo Volunt\u00e1rio,Mariana Gomes Pinheiro,22997963875,Solteiro,,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Raquel Gonzaga de Alcantara,22981266038,Divorciada,,Sim,KIDS Service,4/11/2026,,,,\nNovo Volunt\u00e1rio,Roberta dos Santos Anjos Maria,21964304382,Casado no Civil,Lucio Jos\u00e9 Maria,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ros\u00e2ngela Sampaio,21998687736,Casado no Civil,Itamar Sampaio,Sim,A\u00e7\u00e3o Social,4/11/2026,,,,\nNovo Volunt\u00e1rio,Cristina Vieira,27998813071,,,Sim,Diaconia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Thyago Gabriel Hildebrando Teles,22997426874,Solteiro,,Sim,T\u00e9cnica,4/11/2026,,,,\nNovo Volunt\u00e1rio,Italo Souza Fumian,22992550162,Casado no Civil,Barbara Ferreira de Oliveira Fumian,Sim,KIDS,4/11/2026,,,,\nNovo Volunt\u00e1rio,Maria Maura Leal Dias,8287497443,Casado no Civil,Daniel Ant\u00e3o Dias,Sim,Acolhimento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Daniel Ant\u00e3o Dias,8287362071,Casado no Civil,Maria Maura Leal Dias,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Patricia Vieira Silva,3185291662,Casado no Civil,An\u00edzio Silva,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ricardo Machado Souza,22997986883,Solteiro,,Sim,M\u00eddia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Charlen Alves Ferreira,22992160680,Casado no Civil,Raquel Carvalho Correia,N\u00e3o,Estacionamento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Maria Eduarda de Arruda Mello Figueira,22999294024,Casado no Civil,Guilherme Mendon\u00e7a Figueira,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Guilherme Mendon\u00e7a Figueira,22998942787,Casado no Civil,Maria Eduarda de Arruda Mello Figueira,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ingridy Reis dos Santos ,22999873653,Separada,,Sim,KIDS Service,4/11/2026,,,,\nNovo Volunt\u00e1rio,Elaine Barbosa Lima Silva,22988585714,Vi\u00fava,,Sim,Diaconia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Junior Roque,21992534886,Casado no Civil,,Sim,Diaconia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Leonardo Amaral Marques,22974025427,Casado no Civil,Ketellen Amaral Marques,Sim,T\u00e9cnica,4/11/2026,,,,\nNovo Volunt\u00e1rio,Bernardo de Oliveira Aguiar,22997460852,Solteiro,,Sim,Produ\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ubiratan Marins Nunes,22992044163,Casado no Civil,Maria C S Sharma,Sim,Consolida\u00e7\u00e3o,4/11/2026,,,,\nNovo Volunt\u00e1rio,Ana Paula Gomes dos Santos,22988485927,Vi\u00fava,,Sim,Diaconia,4/11/2026,,,,\nNovo Volunt\u00e1rio,Elizangela Teles,22974013763,Divorciada,,Sim,Acolhimento,4/11/2026,,,,\nNovo Volunt\u00e1rio,Artur Miguel Sarmento Pinheiro,22981490096,Solteiro,,Sim,A\u00e7\u00e3o Social,4/11/2026,,,,\nNovo Volunt\u00e1rio,Yan leal dias leite,7499163001,Solteiro,,Sim,T\u00e9cnica,4/11/2026,1/30/2009,,,\nNovo Volunt\u00e1rio,Davi Ara\u00fajo Pinho da Silva,22999715145,Solteiro,,Sim,M\u00eddia,4/11/2026,5/9/2012,,,\nNovo Volunt\u00e1rio,Caio Eduardo Pereira dos Santos Silva,22997162137,Solteiro,,Sim,M\u00eddia,4/11/2026,9/8/2011,,,\nNovo Volunt\u00e1rio,Vitor Hugo Martins,22997512887,Solteiro,,Sim,M\u00eddia,4/11/2026,9/4/2007,,,\nNovo Volunt\u00e1rio,Wanessa Christina de Oliveira Lira,21971242765,Casado no Civil,Daniel Mauricio Peres de Lira,Sim,Diaconia,4/11/2026,10/21/1980,,,\nNovo Volunt\u00e1rio,Daniel Mauricio Peres de Lira,21982506449,Casado no Civil,Wanessa Christina de Oliveira Lira,Sim,Diaconia,4/11/2026,5/27/1985,,,\nNovo Volunt\u00e1rio,Carlos Eduardo Pereira dos Santos Silva,22997848703,Casado no Civil,Pamela Da Silva Ribeiro dos Santos,Sim,Recep\u00e7\u00e3o,4/11/2026,2/5/1981,,,\nNovo Volunt\u00e1rio,Pamela Da Silva Ribeiro dos Santos,22999227043,Casado no Civil,Carlos Eduardo Pereira dos Santos Silva,Sim,Recep\u00e7\u00e3o,4/11/2026,3/19/1985,,,\nNovo Volunt\u00e1rio,Gisele Valad\u00e3o Martins,22992488390,Solteiro,,Sim,Acolhimento,4/11/2026,4/7/1992,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rodrigo de Souza Damaceno,22992522717,Casado no civil,Paloma Farias ,Sim,Consolida\u00e7\u00e3o,4/15/2026,3/5/1986,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Luciana Ramalho da Silva,22988148745,Divorciada,,Sim,Consolida\u00e7\u00e3o,4/15/2026,11/23/1972,,,\nNovo Volunt\u00e1rio,Juliana Ribeiro,22981458465,Casado no civil,Renan Ferreira Barboza,Sim,Incluives,4/15/2026,3/28/1995,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Gabriel da Silva Cartacho,22997477365,Solterio,,Sim,Intercess\u00e3o,4/15/2026,8/29/1996,,,\nMudan\u00e7a de \u00e1rea,Raquel de farias silva,22992240916,Casado no civil,Cosme da silva machado,Sim,Kids Service,4/15/2026,2/9/2000,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Nath\u00e1lia de Andrade Vieira de Azevedo,22974011631,Casado no civil,Thiago Ribeiro de Azevedo,Sim,Recep\u00e7\u00e3o,4/15/2026,8/27/1997,,,\nMudan\u00e7a de \u00e1rea,Samuel Rezende,22988748702,Solterio,,Sim,Incluives,4/15/2026,9/2/2005,,,\nNovo Volunt\u00e1rio,Anne Beatryz Feitoza de Oliveira,22988068569,Solterio,,Sim,Kids,4/15/2026,10/26/2006,,,\nNovo Volunt\u00e1rio,Wanderson Dutra da Concei\u00e7\u00e3o,22992799531,Solterio,,Sim,Estacionamento,4/15/2026,8/2/1982,,,\nNovo Volunt\u00e1rio,Felipe Guilherme dos santos lima,22999548414,Solterio,,Sim,Kids,4/15/2026,10/1/2014,,,\nNovo Volunt\u00e1rio,Luis Alves da Costa J\u00fanior,22999172792,Casado no civil,,Sim,Estacionamento,4/15/2026,10/28/1981,,,\nNovo Volunt\u00e1rio,Pricila Oliveira da Silva Cosme,22998161985,Casado no civil,Clair Jos\u00e9 Cosme,Sim,Incluives,4/15/2026,9/10/1980,,,\nNovo Volunt\u00e1rio,Levi Ferreira Cardozo,22974035915,Solterio,,Sim,Diaconia,4/15/2026,5/24/2007,,,\nNovo Volunt\u00e1rio,Jean warley dias do nascimento,22981265603,Solterio,,Sim,Voluntariado,4/15/2026,7/12/2009,,,\nNovo Volunt\u00e1rio,Leonardo Daniel Cottini,22997071947,Casado no civil,Beatriz da Silva Marques Cottini,Sim,T\u00e9cnica,4/15/2026,10/12/1993,,,\n\"J\u00e1 estou servindo na \u00e1rea, apenas para cadastro.\",Rosilene dos Santos,22999265374,Casado no civil,Fabio,Sim,Recep\u00e7\u00e3o,4/15/2026,1/25/1982,,,\nNovo Volunt\u00e1rio,Dayana Miranda Rosete Campos,22970418428,Casado no civil,Felipe Jack Lopes Campos,Sim,Acolhimento,4/15/2026,11/5/1987,,,\nNovo Volunt\u00e1rio,Talita Gon\u00e7alves,21990307942,Casado no civil,Michael de Souza Alves ,Sim,Consolida\u00e7\u00e3o,4/15/2026,2/22/2000,,,\nNovo Volunt\u00e1rio,Larissa Cardoso Guerra,21990278039,Solteiro,,Sim,KIDS,4/15/2026,5/18/2012,,,\nNovo Volunt\u00e1rio,Gabriela de Andrade Ferreira Klem,22997655816,Casado no Civil,Jo\u00e3o Victor Ferreira Klem,Sim,KIDS,4/15/2026,5/6/2001,,,\nNovo Volunt\u00e1rio,Jo\u00e3o Victor Ferreira Klem,2299740-4377,Casado no Civil,Gabriela de Andrade Ferreira Klem,Sim,Estacionamento,4/15/2026,4/29/1999,,,\nNovo Volunt\u00e1rio,Th\u00e1bata Karoline Monteiro,22997133145,Casado no Civil,Pedro Henrique Campos Souza,Sim,Acolhimento,4/15/2026,11/27/1997,,,\nNovo Volunt\u00e1rio,Nat\u00e1lia Martins de Oliveira,22998900331,Casado no Civil,Marcos Paulo Gama Pereira,Sim,Recep\u00e7\u00e3o,4/15/2026,1/8/1990,,,\nNovo Volunt\u00e1rio,Lucas Samuel da Silva Gonzaga,21985839681,Divorciado,,Sim,Transmiss\u00e3o,4/15/2026,4/17/1996,,,\nNovo Volunt\u00e1rio,Evaldo Gusm\u00e3o dos Santos,22992676098,N\u00e3o \u00e9 casado no civil,Tha\u00eds Pinheiro Mathias,Sim,A\u00e7\u00e3o Social,4/15/2026,9/15/1987,,,\nNovo Volunt\u00e1rio,Djalma Luiz de Souza,21970132811,Casado no Civil,Ana Claudia Carolina,Sim,Consolida\u00e7\u00e3o,4/15/2026,7/17/1986,,,\nNovo Volunt\u00e1rio,Maria Clara de Oliveira Cunha,22992161361,Solteiro,,N\u00e3o,Acollhimento,4/15/2026,11/5/2006,,,";
+    const GVIZ_JSONP_BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:ivesDashboardCallback;out:json&gid=${SHEET_GID}`;
+
+    const state = {
+      allRows: [],
+      filteredRows: [],
+      source: 'Inicializando',
+      lastSig: '',
+      lastSyncDate: null,
+      lastRenderCount: 0,
+      syncTimer: null,
+      countdownTimer: null,
+      nextSyncAt: null,
+      isLoading: false,
+      pendingScriptId: null,
+    };
+
+    const el = {
+      loadingBox: document.getElementById('loadingBox'),
+      noticeBox: document.getElementById('noticeBox'),
+      errorBox: document.getElementById('errorBox'),
+      searchName: document.getElementById('searchName'),
+      filterArea: document.getElementById('filterArea'),
+      filterEstadoCivil: document.getElementById('filterEstadoCivil'),
+      filterBatizado: document.getElementById('filterBatizado'),
+      filterStartDate: document.getElementById('filterStartDate'),
+      filterEndDate: document.getElementById('filterEndDate'),
+      clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+      reloadBtn: document.getElementById('reloadBtn'),
+      syncNowBtn: document.getElementById('syncNowBtn'),
+      kpiTotal: document.getElementById('kpiTotal'),
+      kpiAreas: document.getElementById('kpiAreas'),
+      kpiBatizados: document.getElementById('kpiBatizados'),
+      kpiNovos: document.getElementById('kpiNovos'),
+      kpiSync: document.getElementById('kpiSync'),
+      kpiTotalHelper: document.getElementById('kpiTotalHelper'),
+      kpiAreasHelper: document.getElementById('kpiAreasHelper'),
+      kpiBatizadosHelper: document.getElementById('kpiBatizadosHelper'),
+      kpiNovosHelper: document.getElementById('kpiNovosHelper'),
+      kpiSyncHelper: document.getElementById('kpiSyncHelper'),
+      miniMostrando: document.getElementById('miniMostrando'),
+      miniFonte: document.getElementById('miniFonte'),
+      lastUpdated: document.getElementById('lastUpdated'),
+      nextSync: document.getElementById('nextSync'),
+      statusBadgeText: document.getElementById('statusBadgeText'),
+      statusText: document.getElementById('statusText'),
+      statusSubtext: document.getElementById('statusSubtext'),
+      areaBars: document.getElementById('areaBars'),
+      typeBars: document.getElementById('typeBars'),
+      areaMeta: document.getElementById('areaMeta'),
+      typeMeta: document.getElementById('typeMeta'),
+      tableMeta: document.getElementById('tableMeta'),
+      leadMeta: document.getElementById('leadMeta'),
+      leadAreaCount: document.getElementById('leadAreaCount'),
+      leadICCount: document.getElementById('leadICCount'),
+      leadExtraCount: document.getElementById('leadExtraCount'),
+      leadAreaList: document.getElementById('leadAreaList'),
+      leadICList: document.getElementById('leadICList'),
+      leadExtraList: document.getElementById('leadExtraList'),
+      areaEmpty: document.getElementById('areaEmpty'),
+      typeEmpty: document.getElementById('typeEmpty'),
+      tableBody: document.getElementById('tableBody'),
+      tableSummary: document.getElementById('tableSummary'),
+    };
+
+    function normalizeText(value) {
+      return String(value ?? '')
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    }
+
+    function titleCase(value) {
+      const text = String(value ?? '').trim();
+      if (!text) return '-';
+      return text
+        .toLowerCase()
+        .split(' ')
+        .filter(Boolean)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString('pt-BR');
+    }
+
+    function formatPercent(value) {
+      return `${(Number(value || 0)).toFixed(1).replace('.', ',')}%`;
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function formatDate(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '-';
+      return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function formatDateOnly(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    function formatMonthLabel(yyyymm) {
+      if (!yyyymm) return '-';
+      const [year, month] = yyyymm.split('-').map(Number);
+      const base = new Date(year, (month || 1) - 1, 1);
+      return base.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    }
+
+    function normalizeArea(value) {
+      const raw = normalizeText(value);
+      if (!raw) return 'Não informado';
+      const map = [
+        ['kids', 'Kids'],
+        ['acolh', 'Acolhimento'],
+        ['consol', 'Consolidação'],
+        ['midia', 'Mídia'],
+        ['mídia', 'Mídia'],
+        ['store', 'Store'],
+        ['transm', 'Transmissão'],
+        ['inclu', 'Incluives'],
+        ['diacon', 'Diaconia'],
+        ['produc', 'Produção'],
+        ['louvor', 'Louvor'],
+        ['intercess', 'Intercessão'],
+        ['recep', 'Recepção'],
+      ];
+      for (const [needle, label] of map) {
+        if (raw.includes(needle)) return label;
+      }
+      return titleCase(String(value).replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim());
+    }
+
+    function normalizeEstadoCivil(value) {
+      const raw = normalizeText(value);
+      if (!raw) return 'Não informado';
+      if (raw.includes('solt')) return 'Solteiro';
+      if (raw.includes('uniao') || raw.includes('união')) return 'União estável';
+      if (raw.includes('divorc')) return 'Divorciado';
+      if (raw.includes('viuv')) return 'Viúvo';
+      if (raw.includes('casado no civil')) return 'Casado no civil';
+      if (raw.includes('casado')) return 'Casado';
+      return titleCase(value);
+    }
+
+    function normalizeBatizado(value) {
+      const raw = normalizeText(value);
+      if (!raw) return 'Não informado';
+      if (['sim', 'yes', 'y', 's'].includes(raw)) return 'Sim';
+      if (['nao', 'não', 'no', 'n'].includes(raw)) return 'Não';
+      return titleCase(value);
+    }
+
+    function classifyVolunteerType(value) {
+      const raw = normalizeText(value);
+      if (!raw) return 'Não informado';
+      if (raw.includes('novo')) return 'Novo voluntário';
+      if (raw.includes('mudanca') || raw.includes('mudança')) return 'Mudança de área';
+      if (raw.includes('ja estou') || raw.includes('já estou') || raw.includes('servindo')) return 'Já serve';
+      return titleCase(value);
+    }
+
+    function parseDate(value) {
+      if (!value) return null;
+      if (value instanceof Date && !Number.isNaN(value.getTime())) return new Date(value.getTime());
+      const text = String(value).trim();
+      if (!text) return null;
+
+      const gviz = text.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/i);
+      if (gviz) {
+        return new Date(
+          Number(gviz[1]),
+          Number(gviz[2]),
+          Number(gviz[3]),
+          Number(gviz[4] || 0),
+          Number(gviz[5] || 0),
+          Number(gviz[6] || 0)
+        );
+      }
+
+      const normalizedText = text.replace(/\s+/g, ' ').trim();
+      const brMatch = normalizedText.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+      if (brMatch) {
+        let day = Number(brMatch[1]);
+        let month = Number(brMatch[2]);
+        let year = Number(brMatch[3]);
+        const hour = Number(brMatch[4] || 0);
+        const minute = Number(brMatch[5] || 0);
+        const second = Number(brMatch[6] || 0);
+        if (year < 100) year += 2000;
+        if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
+          return new Date(year, month - 1, day, hour, minute, second);
+        }
+      }
+
+      const isoMatch = normalizedText.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+      if (isoMatch) {
+        return new Date(
+          Number(isoMatch[1]),
+          Number(isoMatch[2]) - 1,
+          Number(isoMatch[3]),
+          Number(isoMatch[4] || 0),
+          Number(isoMatch[5] || 0),
+          Number(isoMatch[6] || 0)
+        );
+      }
+
+      const fallback = new Date(normalizedText);
+      return Number.isNaN(fallback.getTime()) ? null : fallback;
+    }
+
+    function csvToRows(csvText) {
+      const rows = [];
+      let current = '';
+      let row = [];
+      let inQuotes = false;
+
+      for (let i = 0; i < csvText.length; i += 1) {
+        const char = csvText[i];
+        const next = csvText[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\n') && !inQuotes) {
+          if (char === '\n' && next === '\n') i += 1;
+          row.push(current);
+          rows.push(row);
+          row = [];
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      if (current.length || row.length) {
+        row.push(current);
+        rows.push(row);
+      }
+
+      if (!rows.length) return [];
+      const headers = rows[0].map(item => String(item || '').trim());
+      return rows.slice(1)
+        .filter(values => values.some(cell => String(cell || '').trim() !== ''))
+        .map(values => Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ''])));
+    }
+
+    function getField(obj, possibleKeys) {
+      for (const key of possibleKeys) {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined) return obj[key];
+      }
+      return '';
+    }
+
+    function mapRow(raw) {
+      const nome = titleCase(getField(raw, ['Nome completo', 'nome completo', 'Nome']));
+      const area = normalizeArea(getField(raw, [
+        'Deseja ser voluntário em qual área ?',
+        'Deseja ser voluntario em qual area ?',
+        'Área',
+        'Area'
+      ]));
+      const estadoCivil = normalizeEstadoCivil(getField(raw, ['Estado civil', 'estado civil']));
+      const batizado = normalizeBatizado(getField(raw, ['Batizado', 'batizado']));
+      const tipo = classifyVolunteerType(getField(raw, ['Escolha a opção', 'Escolha a opcao', 'Tipo']));
+      const dataCadastroH = getField(raw, ['Data de Cadastro', 'Data de cadastro', 'Data cadastro', 'Data Cadastro', 'Carimbo de data/hora', 'Timestamp']);
+      const dataCadastro = parseDate(dataCadastroH);
+      const leaderArea = titleCase(getField(raw, ['Caso seja líder de área, informe a área abaixo', 'Caso seja lider de area, informe a area abaixo']));
+      const leaderIC = titleCase(getField(raw, ['Caso seja líder de IC, informe o nome do IC abaixo:', 'Caso seja lider de IC, informe o nome do IC abaixo:']));
+      const extraMinisterios = titleCase(getField(raw, ['Caso sirva em mais uma área(s) ou ministério(s), informe abaixo:', 'Caso sirva em mais uma area(s) ou ministerio(s), informe abaixo:']));
+      const monthKey = dataCadastro ? `${dataCadastro.getFullYear()}-${pad(dataCadastro.getMonth() + 1)}` : '';
+      const dateKey = formatDateOnly(dataCadastro);
+
+      return {
+        nome,
+        area,
+        estadoCivil,
+        batizado,
+        tipo,
+        dataCadastro,
+        dataCadastroFormatada: formatDate(dataCadastro),
+        monthKey,
+        dateKey,
+        leaderArea,
+        leaderIC,
+        extraMinisterios,
+        isLeaderArea: leaderArea !== '-',
+        isLeaderIC: leaderIC !== '-',
+        hasExtraMinisterios: extraMinisterios !== '-',
+      };
+    }
+
+    function gvizToObjects(response) {
+      const table = response && response.table;
+      if (!table || !Array.isArray(table.cols) || !Array.isArray(table.rows)) throw new Error('Estrutura da planilha não reconhecida.');
+      const headers = table.cols.map(col => (col && col.label ? String(col.label).trim() : ''));
+      return table.rows
+        .map(row => {
+          const cells = Array.isArray(row.c) ? row.c : [];
+          return Object.fromEntries(headers.map((header, index) => {
+            const cell = cells[index] || {};
+            const value = cell.v instanceof Date ? cell.v : (cell.f ?? cell.v ?? '');
+            return [header, value];
+          }));
+        })
+        .filter(item => Object.values(item).some(value => String(value ?? '').trim() !== ''));
+    }
+
+    function fillSelect(select, values, placeholder) {
+      const previous = select.value;
+      select.innerHTML = '';
+      const first = document.createElement('option');
+      first.value = '';
+      first.textContent = placeholder;
+      select.appendChild(first);
+      values.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+      if ([...select.options].some(opt => opt.value === previous)) select.value = previous;
+    }
+
+    function populateFilters(rows) {
+      const areas = [...new Set(rows.map(item => item.area).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+      const estados = [...new Set(rows.map(item => item.estadoCivil).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+      fillSelect(el.filterArea, areas, 'Todas as áreas');
+      fillSelect(el.filterEstadoCivil, estados, 'Todos os estados civis');
+    }
+
+    function updateKPIs(rows) {
+      const total = rows.length;
+      const uniqueAreas = new Set(rows.map(item => item.area).filter(area => area && area !== 'Não informado')).size;
+      const batizados = rows.filter(item => item.batizado === 'Sim').length;
+      const novos = rows.filter(item => item.tipo === 'Novo voluntário').length;
+      const batizadosPercent = total ? (batizados / total) * 100 : 0;
+
+      el.kpiTotal.textContent = formatNumber(total);
+      el.kpiAreas.textContent = formatNumber(uniqueAreas);
+      el.kpiBatizados.textContent = formatPercent(batizadosPercent);
+      el.kpiNovos.textContent = formatNumber(novos);
+
+      el.kpiTotalHelper.textContent = total ? 'Registros dentro do filtro aplicado' : 'Sem registros para o filtro atual';
+      el.kpiAreasHelper.textContent = uniqueAreas ? 'Áreas distintas ativas na visualização' : 'Nenhuma área identificada';
+      el.kpiBatizadosHelper.textContent = `${formatNumber(batizados)} pessoas marcadas como batizadas`;
+      el.kpiNovosHelper.textContent = `${formatNumber(novos)} registros marcados como novos voluntários`;
+      el.kpiSync.textContent = '15s';
+      el.kpiSyncHelper.textContent = state.source === 'Google Sheets online' ? 'Sincronização ativa com a planilha' : 'Modo contingência com snapshot local';
+    }
+
+    function renderBars(container, emptyEl, metaEl, data, typeClass) {
+      container.innerHTML = '';
+      if (!data.length) {
+        emptyEl.classList.remove('hidden');
+        metaEl.textContent = '0 itens';
+        return;
+      }
+      emptyEl.classList.add('hidden');
+      const max = Math.max(...data.map(item => item.value), 1);
+      metaEl.textContent = `${data.length} ${data.length === 1 ? 'categoria' : 'categorias'}`;
+      data.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = `bar-row ${typeClass || ''}`;
+        row.innerHTML = `
+          <div class="bar-label">${item.label}</div>
+          <div class="bar-track"><div class="bar-fill"></div></div>
+          <div class="bar-value">${formatNumber(item.value)}</div>
+        `;
+        container.appendChild(row);
+        const fill = row.querySelector('.bar-fill');
+        requestAnimationFrame(() => {
+          fill.style.width = `${Math.max(8, (item.value / max) * 100)}%`;
+        });
+      });
+    }
+
+    function renderTable(rows) {
+      el.tableBody.innerHTML = '';
+      if (!rows.length) {
+        el.tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:28px 16px;">Nenhum voluntário encontrado com os filtros selecionados.</td></tr>';
+        el.tableSummary.textContent = 'Sem resultados para exibir';
+        el.tableMeta.textContent = '0 linhas';
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      rows.forEach(item => {
+        const tr = document.createElement('tr');
+        const tipoClass = item.tipo === 'Novo voluntário' ? 'chip-tipo-novo' : 'chip-tipo-existente';
+        const batizadoClass = item.batizado === 'Sim' ? 'chip-batizado-sim' : 'chip-batizado-nao';
+        tr.innerHTML = `
+          <td class="name-cell"><strong>${item.nome}</strong><span style="color:var(--muted); font-size:12px;">Cadastro: ${item.dateKey || 'Sem data'}</span></td>
+          <td><span class="chip chip-area">${item.area}</span></td>
+          <td>${item.estadoCivil}</td>
+          <td><span class="chip ${batizadoClass}">${item.batizado}</span></td>
+          <td><span class="chip ${tipoClass}">${item.tipo}</span></td>
+          <td>${item.dataCadastroFormatada}</td>
+          <td>${item.leaderArea}</td>
+          <td>${item.leaderIC}</td>
+          <td>${item.extraMinisterios}</td>
+        `;
+        fragment.appendChild(tr);
+      });
+      el.tableBody.appendChild(fragment);
+      el.tableSummary.textContent = `${formatNumber(rows.length)} registro(s) exibido(s)`;
+      el.tableMeta.textContent = `${formatNumber(rows.length)} linhas`;
+    }
+
+    function renderLeadList(container, items, emptyText, formatter) {
+      container.innerHTML = '';
+      if (!items.length) {
+        container.innerHTML = `<div class="empty-state">${emptyText}</div>`;
+        return;
+      }
+      const fragment = document.createDocumentFragment();
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'lead-item';
+        div.innerHTML = formatter(item);
+        fragment.appendChild(div);
+      });
+      container.appendChild(fragment);
+    }
+
+    function renderLeadership(rows) {
+      const leaderAreaRows = rows.filter(item => item.isLeaderArea);
+      const leaderICRows = rows.filter(item => item.isLeaderIC);
+      const extraRows = rows.filter(item => item.hasExtraMinisterios);
+
+      el.leadAreaCount.textContent = formatNumber(leaderAreaRows.length);
+      el.leadICCount.textContent = formatNumber(leaderICRows.length);
+      el.leadExtraCount.textContent = formatNumber(extraRows.length);
+      el.leadMeta.textContent = `${formatNumber(leaderAreaRows.length + leaderICRows.length + extraRows.length)} sinalizações`;
+
+      renderLeadList(
+        el.leadAreaList,
+        leaderAreaRows,
+        'Nenhum líder de área encontrado neste recorte.',
+        item => `<strong>${item.nome}</strong><span>Área liderada: ${item.leaderArea}<br>Área principal: ${item.area}</span>`
+      );
+
+      renderLeadList(
+        el.leadICList,
+        leaderICRows,
+        'Nenhum líder de IC encontrado neste recorte.',
+        item => `<strong>${item.nome}</strong><span>IC: ${item.leaderIC}<br>Área principal: ${item.area}</span>`
+      );
+
+      renderLeadList(
+        el.leadExtraList,
+        extraRows,
+        'Nenhuma atuação extra informada neste recorte.',
+        item => `<strong>${item.nome}</strong><span>Atua também em: ${item.extraMinisterios}<br>Área principal: ${item.area}</span>`
+      );
+    }
+
+    function applyFilters() {
+      const q = normalizeText(el.searchName.value);
+      const area = el.filterArea.value;
+      const estado = el.filterEstadoCivil.value;
+      const batizado = el.filterBatizado.value;
+      const parsedStartDate = parseDate(el.filterStartDate.value);
+      const parsedEndDate = parseDate(el.filterEndDate.value);
+      let startTime = parsedStartDate ? new Date(parsedStartDate.getFullYear(), parsedStartDate.getMonth(), parsedStartDate.getDate(), 0, 0, 0, 0).getTime() : null;
+      let endTime = parsedEndDate ? new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth(), parsedEndDate.getDate(), 23, 59, 59, 999).getTime() : null;
+
+      if (startTime !== null && endTime !== null && startTime > endTime) {
+        const swap = startTime;
+        startTime = endTime;
+        endTime = swap;
+      }
+
+      state.filteredRows = state.allRows
+        .filter(item => !q || normalizeText(item.nome).includes(q))
+        .filter(item => !area || item.area === area)
+        .filter(item => !estado || item.estadoCivil === estado)
+        .filter(item => !batizado || item.batizado === batizado)
+        .filter(item => {
+          if (startTime === null) return true;
+          const itemTime = item.dataCadastro instanceof Date ? item.dataCadastro.getTime() : NaN;
+          return !Number.isNaN(itemTime) && itemTime >= startTime;
+        })
+        .filter(item => {
+          if (endTime === null) return true;
+          const itemTime = item.dataCadastro instanceof Date ? item.dataCadastro.getTime() : NaN;
+          return !Number.isNaN(itemTime) && itemTime <= endTime;
+        })
+        .sort((a, b) => {
+          const timeA = a.dataCadastro instanceof Date ? a.dataCadastro.getTime() : 0;
+          const timeB = b.dataCadastro instanceof Date ? b.dataCadastro.getTime() : 0;
+          return timeB - timeA;
+        });
+
+      state.lastRenderCount = state.filteredRows.length;
+      updateKPIs(state.filteredRows);
+
+      const areaCounts = Object.entries(state.filteredRows.reduce((acc, item) => {
+        acc[item.area] = (acc[item.area] || 0) + 1;
+        return acc;
+      }, {}))
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, value]) => ({ label, value }));
+
+      const typeCounts = Object.entries(state.filteredRows.reduce((acc, item) => {
+        acc[item.tipo] = (acc[item.tipo] || 0) + 1;
+        return acc;
+      }, {}))
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, value]) => ({ label, value }));
+
+      renderBars(el.areaBars, el.areaEmpty, el.areaMeta, areaCounts, 'area');
+      renderBars(el.typeBars, el.typeEmpty, el.typeMeta, typeCounts, 'type');
+      renderLeadership(state.filteredRows);
+      renderTable(state.filteredRows);
+
+      el.miniMostrando.textContent = formatNumber(state.filteredRows.length);
+      el.statusText.textContent = state.filteredRows.length
+        ? `Exibindo ${formatNumber(state.filteredRows.length)} voluntário(s) com base nos filtros atuais.`
+        : 'Nenhum registro encontrado com o recorte selecionado.';
+      el.statusSubtext.textContent = state.source === 'Google Sheets online'
+        ? ' Os dados foram lidos online e continuam sendo verificados automaticamente.'
+        : ' A visualização está usando a cópia de segurança embutida porque a leitura online falhou neste momento.';
+    }
+
+    function setLoading(visible, message) {
+      el.loadingBox.style.display = visible ? 'block' : 'none';
+      if (message) el.loadingBox.textContent = message;
+    }
+
+    function setNotice(message) {
+      el.noticeBox.textContent = message || '';
+      el.noticeBox.style.display = message ? 'block' : 'none';
+    }
+
+    function setError(message) {
+      el.errorBox.textContent = message || '';
+      el.errorBox.style.display = message ? 'block' : 'none';
+    }
+
+    function setLastUpdated(date) {
+      state.lastSyncDate = date instanceof Date ? date : new Date();
+      el.lastUpdated.textContent = formatDate(state.lastSyncDate);
+    }
+
+    function updateNextSyncDisplay() {
+      if (!state.nextSyncAt) {
+        el.nextSync.textContent = '--';
+        return;
+      }
+      const diff = Math.max(0, state.nextSyncAt - Date.now());
+      const seconds = Math.ceil(diff / 1000);
+      el.nextSync.textContent = seconds ? `${seconds}s` : 'agora';
+    }
+
+    function scheduleNextSync() {
+      clearTimeout(state.syncTimer);
+      clearInterval(state.countdownTimer);
+      state.nextSyncAt = Date.now() + POLL_INTERVAL_MS;
+      updateNextSyncDisplay();
+      state.countdownTimer = setInterval(updateNextSyncDisplay, 1000);
+      state.syncTimer = setTimeout(() => loadData({ silent: true }), POLL_INTERVAL_MS);
+    }
+
+    function loadFromEmbedded(reason) {
+      const mapped = csvToRows(EMBEDDED_CSV).map(mapRow);
+      state.allRows = mapped;
+      state.source = 'Snapshot embutido';
+      populateFilters(state.allRows);
+      applyFilters();
+      setLastUpdated(new Date());
+      el.miniFonte.textContent = 'Snapshot';
+      el.statusBadgeText.textContent = 'Modo contingência';
+      setNotice(reason || 'A leitura online falhou e o dashboard exibiu a cópia de segurança embutida.');
+      setError('');
+      setLoading(false);
+      scheduleNextSync();
+    }
+
+    function processOnlineResponse(response, options = {}) {
+      const onlineRows = gvizToObjects(response).map(mapRow);
+      if (!onlineRows.length) throw new Error('A planilha retornou 0 registros válidos.');
+      state.allRows = onlineRows;
+      state.source = 'Google Sheets online';
+      state.lastSig = response.sig || response.version || String(Date.now());
+      populateFilters(state.allRows);
+      applyFilters();
+      setLastUpdated(new Date());
+      el.miniFonte.textContent = 'Online';
+      el.statusBadgeText.textContent = 'Sincronização automática ativa';
+      setError('');
+      setNotice(options.notice || '');
+      setLoading(false);
+      scheduleNextSync();
+    }
+
+    function requestJsonp() {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'ivesDashboardCallback';
+        const scriptId = `sheet-jsonp-${Date.now()}`;
+        const timeout = setTimeout(() => reject(new Error('Tempo excedido ao consultar o Google Sheets.')), 10000);
+
+        window[callbackName] = (response) => {
+          clearTimeout(timeout);
+          const script = document.getElementById(scriptId);
+          if (script) script.remove();
+          resolve(response);
+        };
+
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.src = `${GVIZ_JSONP_BASE}&cachebust=${Date.now()}`;
+        script.async = true;
+        script.onerror = () => {
+          clearTimeout(timeout);
+          script.remove();
+          reject(new Error('Não foi possível carregar a leitura online da planilha.'));
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    async function loadData(options = {}) {
+      if (state.isLoading) return;
+      state.isLoading = true;
+      if (!options.silent) setLoading(true, 'Sincronizando dados da planilha...');
+      setError('');
+
+      try {
+        const response = await requestJsonp();
+        processOnlineResponse(response, { notice: options.notice || '' });
+      } catch (error) {
+        loadFromEmbedded(error.message || 'Falha ao acessar a planilha online.');
+      } finally {
+        state.isLoading = false;
+      }
+    }
+
+    function clearFilters() {
+      el.searchName.value = '';
+      el.filterArea.value = '';
+      el.filterEstadoCivil.value = '';
+      el.filterBatizado.value = '';
+      el.filterStartDate.value = '';
+      el.filterEndDate.value = '';
+      applyFilters();
+    }
+
+    [
+      el.searchName,
+      el.filterArea,
+      el.filterEstadoCivil,
+      el.filterBatizado,
+      el.filterStartDate,
+      el.filterEndDate,
+    ].filter(Boolean).forEach(input => {
+      input.addEventListener('input', applyFilters);
+      input.addEventListener('change', applyFilters);
+    });
+
+    el.clearFiltersBtn.addEventListener('click', clearFilters);
+    el.reloadBtn.addEventListener('click', () => loadData({ notice: 'Atualização manual concluída.' }));
+    el.syncNowBtn.addEventListener('click', () => loadData({ notice: 'Sincronização manual concluída.' }));
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadData({ silent: true });
+    });
+
+    window.addEventListener('focus', () => loadData({ silent: true }));
+
+    loadData();
+  </script>
+</body>
+</html>
